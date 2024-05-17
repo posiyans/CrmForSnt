@@ -1,0 +1,6 @@
+.env
+.idea
+.phpunit.result.cache
+.phpstorm.meta.php
+_ide_helper.php
+frontend/quasar.config.js
