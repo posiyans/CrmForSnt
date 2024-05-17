@@ -17,17 +17,18 @@
         </q-card-section>
 
         <q-card-section class="q-pt-none">
-          <q-select
-            v-model="options"
-            label="Выбирете поле"
-            :options="list"
-            outlined
-            map-options
-            option-value="id"
-            option-label="name"
-          />
+          <div class="q-mb-sm">
+            <q-select
+              v-model="options"
+              label="Выбирете поле"
+              :options="list"
+              outlined
+              map-options
+              option-value="id"
+              option-label="name"
+            />
+          </div>
           <div>
-
             <component
               v-if="options?.id"
               :is="componentName"
@@ -37,6 +38,7 @@
               :options="options?.options"
               :multiple="options?.type_value === 'multi_select'"
             >
+              -
             </component>
           </div>
         </q-card-section>
@@ -87,13 +89,13 @@ export default defineComponent({
   setup(props, { emit }) {
     const $q = useQuasar()
     const componentName = computed(() => {
-      if (options.value?.type_value === 'string') {
+      if (options.value?.type_value.key === 'string') {
         return StringType
-      } else if (options.value?.type_value === 'boolean') {
+      } else if (options.value?.type_value.key === 'boolean') {
         return BooleanType
-      } else if (options.value?.type_value === 'select') {
+      } else if (options.value?.type_value.key === 'select') {
         return SelectType
-      } else if (options.value?.type_value === 'multi_select') {
+      } else if (options.value?.type_value.key === 'multi_select') {
         return SelectType
       }
       return 'div'

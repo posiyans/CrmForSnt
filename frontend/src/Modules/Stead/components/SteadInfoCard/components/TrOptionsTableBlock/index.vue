@@ -62,7 +62,6 @@ export default defineComponent({
       showEdit,
       errors,
       reload,
-      value,
       editField
     }
   }
@@ -70,10 +69,5 @@ export default defineComponent({
 </script>
 
 <style scoped lang='scss'>
-td, th {
-  //border: 1px solid #606266;
-  //padding: 5px 10px;
-  //text-align: center;
-  //color: #000000;
-}
+
 </style>

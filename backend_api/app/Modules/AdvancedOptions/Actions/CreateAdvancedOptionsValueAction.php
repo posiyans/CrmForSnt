@@ -18,8 +18,7 @@ class CreateAdvancedOptionsValueAction
     public function __construct(AdvancedOptionsModel $options, $parent_id)
     {
         $this->model = AdvancedOptionsValueModel::firstOrNew(
-            ['advanced_options_id' => $options->id],
-            ['commentable_id' => $parent_id],
+            ['advanced_options_id' => $options->id, 'commentable_id' => $parent_id]
         );
     }
 
