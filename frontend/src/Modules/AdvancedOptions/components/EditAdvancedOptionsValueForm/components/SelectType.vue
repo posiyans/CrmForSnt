@@ -8,6 +8,7 @@
       clearable
       :dense="dense"
       :options="options.selectOptions"
+      @clear="clearValue"
       @update:model-value="setValue"
     >
       <template v-slot:option="scope">
@@ -69,11 +70,21 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const setValue = (val) => {
-      val.sort()
+      if (val && props.multiple) {
+        val.sort()
+      }
       emit('update:model-value', val)
     }
+    const clearValue = () => {
+      if (props.multiple) {
+        emit('update:model-value', [])
+      } else {
+        emit('update:model-value', '')
+      }
+    }
     return {
-      setValue
+      setValue,
+      clearValue
     }
   }
 })

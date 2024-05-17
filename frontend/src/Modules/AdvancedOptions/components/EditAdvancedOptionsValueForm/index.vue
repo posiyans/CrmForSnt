@@ -9,7 +9,7 @@
         :label="option?.name"
         dense
         :options="option.options?.options"
-        :multiple="option?.options?.type_value === 'multi_select'"
+        :multiple="option?.options?.type_value.key === 'multi_select'"
       >
       </component>
     </div>
@@ -57,13 +57,13 @@ export default defineComponent({
   setup(props, { emit }) {
     const $q = useQuasar()
     const componentName = computed(() => {
-      if (props.option.options?.type_value === 'string') {
+      if (props.option.options?.type_value.key === 'string') {
         return StringType
-      } else if (props.option.options?.type_value === 'boolean') {
+      } else if (props.option.options?.type_value.key === 'boolean') {
         return BooleanType
-      } else if (props.option.options?.type_value === 'select') {
+      } else if (props.option.options?.type_value.key === 'select') {
         return SelectType
-      } else if (props.option.options?.type_value === 'multi_select') {
+      } else if (props.option.options?.type_value.key === 'multi_select') {
         return SelectType
       }
       return 'div'

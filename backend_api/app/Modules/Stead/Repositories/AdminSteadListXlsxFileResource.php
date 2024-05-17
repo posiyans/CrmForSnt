@@ -4,12 +4,16 @@ namespace App\Modules\Stead\Repositories;
 
 
 use App\Http\Abstracts\AbstaractXlsxFile;
+use App\Modules\AdvancedOptions\Repositories\AdvancedOptionsRepository;
+use App\Modules\AdvancedOptions\Repositories\AdvancedOptionsValueRepository;
+use App\Modules\Stead\Models\SteadModel;
 
 
 class AdminSteadListXlsxFileResource extends AbstaractXlsxFile
 {
 
     protected $spreadsheet;
+    protected $options;
 
     /**
      * Список участков XLSX формате
@@ -30,12 +34,26 @@ class AdminSteadListXlsxFileResource extends AbstaractXlsxFile
     {
         $sheet = $this->spreadsheet->getActiveSheet()->setTitle('Участки');
         $row = 1;
-        $sheet->setCellValue('A' . $row, '№');
-        $sheet->setCellValue('B' . $row, 'Участок');
-        $sheet->setCellValue('C' . $row, 'Размер, кв.м');
-        $sheet->setCellValue('D' . $row, 'Собственник');
-//        $sheet->setCellValue('E' . $row, 'Баланс');
-        $this->setCenter('E');
+        $i = 0;
+        $sheet->setCellValue([++$i, $row], '№');
+        $sheet->setCellValue([++$i, $row], 'Участок');
+        $sheet->setCellValue([++$i, $row], 'Размер, кв.м');
+        $sheet->setCellValue([++$i, $row], 'Собственник');
+//        $this->setCenter('E');
+        $this->createHeaderAdvanced($i);
+    }
+
+    private function createHeaderAdvanced($i)
+    {
+        $sheet = $this->spreadsheet->getActiveSheet()->setTitle('Участки');
+        $this->options = (new AdvancedOptionsRepository())
+            ->forClass(SteadModel::class)
+            ->type('options')
+            ->get();
+        $row = 1;
+        foreach ($this->options as $opt) {
+            $sheet->setCellValue([++$i, $row], $opt->name);
+        }
     }
 
 
@@ -59,16 +77,33 @@ class AdminSteadListXlsxFileResource extends AbstaractXlsxFile
             if ($owner_count > 1) {
                 $this->spreadsheet->getActiveSheet()->getRowDimension($row)->setRowHeight(14 * $owner_count);
             }
-            $sheet->setCellValue('A' . $row, $row - 1);
-            $sheet->setCellValue('B' . $row, $item->number);
-            $sheet->setCellValue('C' . $row, $item->size);
-            $sheet->setCellValue('D' . $row, $owners);
-//            $balans = round($item->getBalans(), 2);
-//            $sheet->setCellValue('E' . $row, $balans);
-//            if ($balans < -1) {
-//                // $this->cellColor('E'.$row);
-//            }
+            $i = 0;
+            $sheet->setCellValue([++$i, $row], $row - 1);
+            $sheet->setCellValue([++$i, $row], $item->number);
+            $sheet->setCellValue([++$i, $row], $item->size);
+            $sheet->setCellValue([++$i, $row], $owners);
+            $this->advancedOptionsFill($item, $i, $row);
             $row++;
+        }
+    }
+
+    private function advancedOptionsFill($stead, $i, $row)
+    {
+        $sheet = $this->spreadsheet->getActiveSheet();
+        foreach ($this->options as $opt) {
+            // todo по 1 шт в базе искать долго
+            // todo boolen тип пределать в  Да/Нет
+            $value = (new AdvancedOptionsValueRepository())->forObject($stead, 'options')->where('advanced_options_id', $opt->id)->first();
+            $text = '';
+            if ($value) {
+                $text = $value ? $value->value['value'] : '';
+                if (is_array($text)) {
+                    $text = implode(', ', $text);
+                }
+                $unitName = isset($value->advanced_options->options['unitName']) ? ' ' . $value->advanced_options->options['unitName'] : '';
+                $text = $text . $unitName;
+            }
+            $sheet->setCellValue([++$i, $row], $text);
         }
     }
 
