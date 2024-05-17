@@ -19,9 +19,14 @@
           <AddAdvancedOptionsBtn
             object-name="stead"
             type="options"
+            @success="reloadOptionsList"
           />
         </div>
-        <AdvancedOptionsList object-name="stead" type="options" />
+        <AdvancedOptionsList
+          object-name="stead"
+          type="options"
+          :key="keyOptions"
+        />
       </q-tab-panel>
     </q-tab-panels>
   </div>
@@ -41,8 +46,14 @@ export default defineComponent({
   props: {},
   setup(props, { emit }) {
     const tab = ref('advanced_options')
+    const keyOptions = ref(1)
+    const reloadOptionsList = () => {
+      keyOptions.value++
+    }
     return {
-      tab
+      tab,
+      keyOptions,
+      reloadOptionsList
     }
   }
 })
