@@ -6,7 +6,7 @@ export function useAdvancedOptionsList(objectName, type) {
   const getData = () => {
     const data = {
       object: objectName,
-      type: type
+      type
     }
     getAdvancedOptionsList(data)
       .then(res => {

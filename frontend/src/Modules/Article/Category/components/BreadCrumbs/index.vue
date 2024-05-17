@@ -1,10 +1,9 @@
 <template>
-  <div class="row q-col-gutter-sm items-center">
+  <div class="row items-center bread-crumbs-block">
     <ItemBlock
-      v-for="(item, index) in findItem"
+      v-for="item in findItem"
       :key="item.id"
       :item="item"
-      :add-arrow="index > 0"
     />
   </div>
 </template>
@@ -78,5 +77,10 @@ export default defineComponent({
 </script>
 
 <style scoped lang='scss'>
-
+.bread-crumbs-block div:not(:last-child):after {
+  content: '>';
+  opacity: .6;
+  margin-right: 5px;
+  margin-left: 5px;
+}
 </style>

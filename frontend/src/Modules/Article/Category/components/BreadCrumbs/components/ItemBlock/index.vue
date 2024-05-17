@@ -1,9 +1,6 @@
 <template>
-  <div>
-    <span v-if="addArrow" class="o-60">
-      >
-    </span>
-    <span class="cursor-pointer breadcrumb" @click="toRoute">
+  <div class="cursor-pointer" @click="toRoute">
+    <span class="breadcrumb">
       {{ item?.label }}
     </span>
   </div>
@@ -11,7 +8,7 @@
 
 <script>
 /* eslint-disable */
-import { defineComponent, ref } from 'vue'
+import { defineComponent } from 'vue'
 import { useRouter } from 'vue-router'
 
 export default defineComponent({
@@ -22,13 +19,8 @@ export default defineComponent({
         return { label: '' }
       }
     },
-    addArrow: {
-      type: Boolean,
-      default: false
-    }
   },
   setup(props, { emit }) {
-    const data = ref(false)
     const router = useRouter()
     const toRoute = () => {
       if (props.item.id) {
@@ -38,7 +30,6 @@ export default defineComponent({
       }
     }
     return {
-      data,
       toRoute
     }
   }
@@ -48,10 +39,8 @@ export default defineComponent({
 <style scoped lang='scss'>
 .breadcrumb {
   &:hover {
-    opacity: 0.65;
+    opacity: 0.6;
   }
-
-  //height: 50px;
 }
 </style>
 
