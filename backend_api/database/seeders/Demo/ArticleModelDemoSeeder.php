@@ -25,7 +25,7 @@ class ArticleModelDemoSeeder extends Seeder
                 'uid' => Str::uuid(),
                 'user_id' => 1,
                 'resume' => 'Параметры для доступа в Демо',
-                'text' => '<p>Вход как Администрация</p><p>email: admin@examples.com</p><p>пароль: 123admin</p><p>&nbsp;</p><p>Вход как собственник</p><p>email: owner@examples.com</p><p>пароль: 123admin</p>',
+                'text' => '<p>Вход как Администрация</p><p>email: admin@examples.com</p><p>пароль: 123admin</p><p>&nbsp;</p><p>Вход как собственник</p><p>email: owner@examples.com</p><p>пароль: 123admin</p><p>&nbsp;</p><p>Код проекта <a href="https://github.com/posiyans/CrmForSnt">https://github.com/posiyans/CrmForSnt</a></p>',
                 'category_id' => 1,
                 'allow_comments' => 3
             ];
