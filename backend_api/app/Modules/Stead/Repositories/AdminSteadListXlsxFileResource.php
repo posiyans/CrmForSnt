@@ -92,16 +92,21 @@ class AdminSteadListXlsxFileResource extends AbstaractXlsxFile
         $sheet = $this->spreadsheet->getActiveSheet();
         foreach ($this->options as $opt) {
             // todo по 1 шт в базе искать долго
-            // todo boolen тип пределать в  Да/Нет
             $value = (new AdvancedOptionsValueRepository())->forObject($stead, 'options')->where('advanced_options_id', $opt->id)->first();
             $text = '';
             if ($value) {
-                $text = $value ? $value->value['value'] : '';
-                if (is_array($text)) {
-                    $text = implode(', ', $text);
+                $advanced_opt = $value->advanced_options;
+                if ($advanced_opt->type_value == 'boolean') {
+                    $text = $value->value['value'] == true ? 'ДА' : 'НЕТ';
+                } else {
+                    $unitName = isset($value->advanced_options->options['unitName']) ? ' ' . $value->advanced_options->options['unitName'] : '';
+                    $text = $value ? $value->value['value'] : '';
+                    if (is_array($text)) {
+                        $text = implode($unitName . ', ', $text);
+                    } else {
+                        $text = $text . $unitName;
+                    }
                 }
-                $unitName = isset($value->advanced_options->options['unitName']) ? ' ' . $value->advanced_options->options['unitName'] : '';
-                $text = $text . $unitName;
             }
             $sheet->setCellValue([++$i, $row], $text);
         }
