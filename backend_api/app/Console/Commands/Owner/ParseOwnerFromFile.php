@@ -5,12 +5,9 @@ namespace App\Console\Commands\Owner;
 use App\Models\Owner\OwnerUserModel;
 use App\Models\Owner\OwnerUserSteadModel;
 use App\Models\Stead;
-use App\Models\Voting\AnswerModel;
-use App\Models\Voting\UserAnswerModel;
-use App\Models\Voting\VotingModel;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Ramsey\Uuid\Uuid;
+use Str;
 
 class ParseOwnerFromFile extends Command
 {
@@ -71,8 +68,8 @@ class ParseOwnerFromFile extends Command
     public function readCsv($file)
     {
         $row = 1;
-        if (($handle = fopen($file, "r")) !== FALSE) {
-            while (($data = fgetcsv($handle, 1000, ";")) !== FALSE) {
+        if (($handle = fopen($file, "r")) !== false) {
+            while (($data = fgetcsv($handle, 1000, ";")) !== false) {
                 $num = count($data);
                 if ($num = 6) {
                     if ($stead = $this->checkStead($data[0], $data[1])) {
@@ -122,7 +119,7 @@ class ParseOwnerFromFile extends Command
         if (strlen($ph) == 12) {
 //            echo $ph;
 //            echo PHP_EOL;
-            return  substr($ph, 0, 2). '('. substr($ph, 2,  3) . ')' . substr($ph, 5, 3) . '-'. substr($ph, 8, 2) . '-'. substr($ph, 10, 2);
+            return substr($ph, 0, 2) . '(' . substr($ph, 2, 3) . ')' . substr($ph, 5, 3) . '-' . substr($ph, 8, 2) . '-' . substr($ph, 10, 2);
         }
         return '';
     }
@@ -147,8 +144,8 @@ class ParseOwnerFromFile extends Command
             }
         }
         if (count($f) > 3) {
-            for ($i =3; $i < count($f); $i++) {
-                $data[2] .= ' '.$f[$i];
+            for ($i = 3; $i < count($f); $i++) {
+                $data[2] .= ' ' . $f[$i];
             }
         }
 
@@ -203,30 +200,30 @@ class ParseOwnerFromFile extends Command
     public function addOwner($fio, $adr, $phone, $phone_add)
     {
         $owner = new OwnerUserModel();
-        $owner->uid = Uuid::uuid4()->toString();
+        $owner->uid = Str::uuid();
         DB::beginTransaction();
         $error = false;
         if ($owner->logAndSave('Добавили собственника')) {
             if (!$owner->setValue('surname', $fio[0])) {
-                $error= true;
+                $error = true;
             }
             if (!$owner->setValue('name', $fio[1])) {
-                $error= true;
+                $error = true;
             }
             if (!$owner->setValue('middle_name', $fio[2])) {
-                $error= true;
+                $error = true;
             }
             if (!$owner->setValue('address', $adr)) {
-                $error= true;
+                $error = true;
             }
             if (!$owner->setValue('address_notifications', $adr)) {
-                $error= true;
+                $error = true;
             }
             if (!$owner->setValue('general_phone', $phone)) {
-                $error= true;
+                $error = true;
             }
             if (!$owner->setValue('phones', $phone_add)) {
-                $error= true;
+                $error = true;
             }
             if (!$error) {
                 DB::commit();

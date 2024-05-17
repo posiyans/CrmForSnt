@@ -7,7 +7,7 @@ use App\Modules\User\Models\UserModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
-use Ramsey\Uuid\Uuid;
+use Str;
 
 /**
  * App\Modules\BanUser\Models\BanUserModel
@@ -61,7 +61,7 @@ class BanUserModel extends MyModel
         } else {
             $this->author_id = null;
         }
-        $this->uid = Uuid::uuid4()->toString();
+        $this->uid = Str::uuid();
         parent::__construct($attributes);
     }
 

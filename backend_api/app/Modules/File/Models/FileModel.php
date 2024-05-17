@@ -5,7 +5,7 @@ namespace App\Modules\File\Models;
 use App\Models\MyModel;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
-use Ramsey\Uuid\Uuid;
+use Str;
 
 /**
  * App\Modules\File\Models\FileModel
@@ -70,7 +70,7 @@ class FileModel extends MyModel
         if (Auth::check()) {
             $this->user_id = Auth::user()->id;
         }
-        $this->uid = Uuid::uuid4()->toString();
+        $this->uid = Str::uuid();
         return parent::__construct($attributes);
     }
 

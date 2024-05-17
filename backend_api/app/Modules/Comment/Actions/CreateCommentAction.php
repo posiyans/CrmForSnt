@@ -8,7 +8,7 @@ use App\Modules\Comment\Models\CommentModel;
 use App\Modules\User\Repositories\GetUserByUidRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Ramsey\Uuid\Uuid;
+use Str;
 
 class CreateCommentAction
 {
@@ -21,7 +21,7 @@ class CreateCommentAction
         $this->comment->commentable_type = get_class($model);
         $this->comment->commentable_uid = $model->$uid_name;
         $this->comment->user_id = Auth::id() ?? null;
-        $this->comment->uid = Uuid::uuid4();
+        $this->comment->uid = Str::uuid();
     }
 
     public function message($text)
@@ -32,7 +32,6 @@ class CreateCommentAction
             (new SendCensorNotificationAction($user, $text))->run();
         }
         ObsceneCensorRus::filterText($text);
-//        $text = str_replace('*', '', $text);
         $this->comment->message = $text;
         return $this;
     }

@@ -5,7 +5,7 @@ namespace App\Modules\Voting\Models;
 use App\Models\MyModel;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
-use Ramsey\Uuid\Uuid;
+use Str;
 
 /**
  * App\Modules\Voting\Models\VotingFileModel
@@ -71,7 +71,7 @@ class VotingFileModel extends MyModel
         } else {
             $this->user_id = 0;
         }
-        $this->uid = Uuid::uuid4()->toString();
+        $this->uid = Str::uuid();
     }
 
 //    public static function saveForModel($file, $model) {

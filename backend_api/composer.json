@@ -21,11 +21,9 @@
     "laravel/framework": "^8.12",
     "laravel/sanctum": "^2.10",
     "laravel/tinker": "^2.5",
-    "laravel/ui": "^3.2",
     "phpoffice/phpspreadsheet": "^1.17",
     "pragmarx/google2fa": "^8.0",
     "predis/predis": "^1.1",
-    "ramsey/uuid": "^4.1",
     "santigarcor/laratrust": "^6.3",
     "tecnickcom/tcpdf": "^6.7.5"
   },

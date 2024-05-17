@@ -11,8 +11,7 @@ use App\Modules\Appeal\Models\AppealModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Mail;
-use Ramsey\Uuid\Uuid;
-
+use Str;
 
 class UserVotingFileUploadController extends Controller
 {
@@ -31,7 +30,7 @@ class UserVotingFileUploadController extends Controller
                 $md5 = Controller::md5_file($inputFile);
                 $inputFile->move($md5['folder'], $md5['md5']);
                 $file->hash = $md5['md5'];
-                $file->uid = Uuid::uuid4()->toString();
+                $file->uid = Str::uuid();
                 $file->name = $inputFile->getClientOriginalName();
                 $file->size = $inputFile->getSize();
                 $file->type = $inputFile->getClientMimeType();

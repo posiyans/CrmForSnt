@@ -3,10 +3,9 @@
 namespace App\Models\Voting;
 
 use App\Models\MyModel;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
-use Ramsey\Uuid\Uuid;
+use Str;
 
 /**
  * App\Models\Voting\VotingFileModel
@@ -49,10 +48,6 @@ use Ramsey\Uuid\Uuid;
  * @method static \Illuminate\Database\Eloquent\Builder|VotingFileModel whereVotingId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|VotingFileModel withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|VotingFileModel withoutTrashed()
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Log> $log
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Log> $log
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Log> $log
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Log> $log
  * @mixin \Eloquent
  */
 class VotingFileModel extends MyModel
@@ -76,12 +71,8 @@ class VotingFileModel extends MyModel
         } else {
             $this->user_id = 0;
         }
-        $this->uid = Uuid::uuid4()->toString();
+        $this->uid = Str::uuid();
     }
-
-//    public static function saveForModel($file, $model) {
-//
-//    }
 
 
     public static function check_availability($voting_id, $stead_id)
