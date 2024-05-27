@@ -35,15 +35,6 @@
       outlined
       clearable
       @update:model-value="setRange" />
-    <div>
-      <q-checkbox
-        :model-value="modelValue.group_by"
-        label="Группировать"
-        true-value="date"
-        false-value=""
-        @update:model-value="setValue($event, 'group_by')"
-      />
-    </div>
   </div>
 </template>
 

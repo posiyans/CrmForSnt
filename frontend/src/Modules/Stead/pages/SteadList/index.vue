@@ -13,7 +13,7 @@
         <q-btn flat icon="settings" color="grey" to="/admin/stead/options" />
       </div>
     </div>
-    <TableBlock :list="list" />
+    <TableBlock :list="list" @reload="handleFilter" />
     <LoadMore :key="key" v-model:listQuery="listQuery" change-url :func="func" @setList="setList" />
   </div>
 </template>
@@ -39,7 +39,7 @@ export default defineComponent({
   },
   props: {},
   setup(props, { emit }) {
-    const key = ref(false)
+    const key = ref(1)
     const downloadLoading = ref(false)
     const list = ref([])
     const func = getSteadsList

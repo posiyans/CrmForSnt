@@ -9,7 +9,6 @@ use App\Modules\Rate\Models\RateGroupModel;
 use App\Modules\Rate\Models\RateTypeModel;
 use App\Modules\Stead\Models\SteadModel;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class GetInstrumentReadingListValidator extends FormRequest
 {
@@ -59,10 +58,6 @@ class GetInstrumentReadingListValidator extends FormRequest
             'date_end' => [
                 'nullable',
                 'date_format:Y-m-d'
-            ],
-            'group_by' => [
-                'nullable',
-                Rule::in(['date'])
             ],
             'xlsx' => [
                 'nullable',

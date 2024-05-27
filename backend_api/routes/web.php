@@ -12,3 +12,7 @@ define('__ROOT__', dirname(__FILE__));
 |
 */
 //
+
+Route::get('/api/v2/home', function () {
+    return redirect('/');
+})->name('home');

@@ -4,9 +4,13 @@
       <q-select
         v-model="invoiceGroup.stead_type"
         :options="[
-          {
-            label: 'Всем участкам',
-            value: 'all',
+            {
+              label: 'Всем участкам',
+              value: 'all',
+            },
+            {
+              label: 'Выборочно',
+              value: 'selected',
             }
           ]"
         map-options
@@ -14,6 +18,13 @@
         outlined
         dense
       />
+    </div>
+    <div v-if="invoiceGroup.stead_type === 'selected'">
+      <div>
+        Выбор участков
+      </div>
+      {{ invoiceGroup.steads }}
+      <AdvancedSelectedStead v-model="invoiceGroup.steads" />
     </div>
     <div class="row items-center">
       <div class="col-grow q-pr-sm">
@@ -80,12 +91,14 @@ import { getRateGroupList, getRateListForGroup } from 'src/Modules/Rate/api/rate
 import { date, useQuasar } from 'quasar'
 import { addInvoiceGroup } from 'src/Modules/Bookkeeping/api/invoiceGroupApi'
 import ShowTime from 'components/ShowTime/index.vue'
+import AdvancedSelectedStead from 'src/Modules/Stead/components/AdvancedSelectedStead/index.vue'
 
 export default defineComponent({
   components: {
     RateGroupSelect,
     RateBlock,
-    ShowTime
+    ShowTime,
+    AdvancedSelectedStead
   },
   props: {},
   setup(props, { emit }) {
@@ -99,6 +112,7 @@ export default defineComponent({
     })
     const invoiceGroup = ref({
       stead_type: 'all',
+      steads: [],
       rate_group_id: '',
       title: '',
     })

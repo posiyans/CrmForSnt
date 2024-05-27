@@ -6,7 +6,9 @@
       </div>
     </div>
     <div v-else>
-      {{ modelValue.value }} {{ modelValue.options.options.unitName }}
+      {{ modelValue.value }} <span v-if="modelValue.value">
+      {{ modelValue.options.options.unitName }}
+    </span>
     </div>
   </div>
 </template>

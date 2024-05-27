@@ -1,6 +1,8 @@
 <template>
   <div>
-    {{ modelValue.value }} {{ modelValue.options.options.unitName }}
+    {{ modelValue.value }} <span v-if="modelValue.value">
+      {{ modelValue.options.options.unitName }}
+    </span>
   </div>
 </template>
 

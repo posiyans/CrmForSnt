@@ -56,8 +56,24 @@
               </router-link>
             </div>
           </q-td>
-          <q-td v-for="item in showAdvancedColumns" :key="item">
-            <AdvancedOptionsShowValue :item="props.row.options.find(i => i.id === item)" />
+          <q-td v-for="item in showAdvancedColumns" :key="item" class="text-center">
+            <AdvancedOptionsTd
+              v-if="props.row.options.find(i => i.options.id === item)"
+              :item="props.row.options.find(i => i.options.id === item)"
+              :edit="editSteadAccess"
+              @success="reload"
+            />
+            <div v-else class="o-60">
+              -
+              <q-popup-edit v-if="editSteadAccess" :model-value="option(item)" v-slot="scope">
+                <AddAdvancedOptionsValueBtn
+                  :options="scope.value"
+                  :parent-id="props.row.id"
+                  @success="reload(scope)"
+                />
+              </q-popup-edit>
+            </div>
+
           </q-td>
           <q-td class="text-center">
             <div class="q-gutter-sm">
@@ -71,20 +87,24 @@
 </template>
 
 <script>
-import { defineComponent, onMounted, ref } from 'vue'
+import { computed, defineComponent, onMounted, ref } from 'vue'
 import OwnerUserNameAndProportionBlock from 'src/Modules/Owner/components/OwnerUserNameAndProportionBlock/index.vue'
 import { useRoute, useRouter } from 'vue-router'
 import UserNameByUid from 'src/Modules/Users/components/UserNameByUid/index.vue'
 import SteadListTableOptions from 'src/Modules/Stead/components/SteadListTableOptions/index.vue'
 import { useAdvancedOptionsList } from 'src/Modules/AdvancedOptions/use/useAdvancedOptionsList'
-import AdvancedOptionsShowValue from 'src/Modules/AdvancedOptions/components/AdvancedOptionsShowValue/index.vue'
+import AddAdvancedOptionsValueBtn from 'src/Modules/AdvancedOptions/components/AddAdvancedOptionsValueBtn/Form.vue'
+import { useAuthStore } from 'src/Modules/Auth/store/useAuthStore'
+import AdvancedOptionsTd from 'src/Modules/Stead/pages/SteadList/components/TableBlock/AdvancedOptionsTd.vue'
+import { SessionStorage } from 'quasar'
 
 export default defineComponent({
   components: {
+    AdvancedOptionsTd,
     OwnerUserNameAndProportionBlock,
     UserNameByUid,
     SteadListTableOptions,
-    AdvancedOptionsShowValue
+    AddAdvancedOptionsValueBtn
   },
   props: {
     list: {
@@ -94,6 +114,7 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const { option, optionsList } = useAdvancedOptionsList('stead', 'options')
+    const storageName = 'SteadShowAdvancedColumns'
     const router = useRouter()
     const route = useRoute()
     const showAdvancedColumns = ref([])
@@ -114,26 +135,45 @@ export default defineComponent({
         label: 'Собственник'
       }
     ]
+    const authStore = useAuthStore()
+    const editSteadAccess = computed(() => {
+      return authStore.checkPermission(['stead-edit'])
+    })
     const toOwner = (uid) => {
       router.push('/admin/owner/show-info/' + uid)
     }
     const setFields = (val) => {
+      SessionStorage.set(storageName, val)
       const oldQuery = route.query
       const query = Object.assign({}, oldQuery)
       query.fields = val
       router.replace({ path: route.path, query })
     }
+    const reload = (scope) => {
+      if (scope) {
+        scope.cancel()
+      }
+      emit('reload')
+    }
     onMounted(() => {
       if (route.query.fields) {
-        route.query.fields.forEach(i => {
-          showAdvancedColumns.value.push(+i)
-        })
+        if (Array.isArray(route.query.fields)) {
+          route.query.fields.forEach(i => {
+            showAdvancedColumns.value.push(+i)
+          })
+        } else {
+          showAdvancedColumns.value.push(+route.query.fields)
+        }
+      } else if (SessionStorage.has(storageName)) {
+        showAdvancedColumns.value = SessionStorage.getItem(storageName)
       }
       // showAdvancedColumns.value = route.query.fields || []
     })
     return {
+      reload,
       toOwner,
       setFields,
+      editSteadAccess,
       columns,
       option,
       optionsList,

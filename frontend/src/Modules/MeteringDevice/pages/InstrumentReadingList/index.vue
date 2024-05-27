@@ -45,7 +45,6 @@ export default defineComponent({
       rate_type_id: '',
       date_start: '',
       date_end: '',
-      group_by: '',
       page: 1,
       limit: 20
     })

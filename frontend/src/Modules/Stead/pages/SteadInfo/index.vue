@@ -9,6 +9,7 @@
           align="left"
           class="text-teal"
           :breakpoint="0"
+          @update:model-value="setTab"
         >
           <q-tab name="steadInfo" label="Данные" />
           <q-tab name="readings" label="Показания" />
@@ -35,7 +36,7 @@
 /* eslint-disable */
 import { computed, defineComponent, onMounted, ref } from 'vue'
 import SteadTab from './components/SteadTab/index.vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { getSteadInfo } from 'src/Modules/Stead/api/stead'
 import { usePrimaryStore } from 'stores/parimary-store'
 import PaymentAndInvoiceForStead from 'src/Modules/Bookkeeping/components/PaymentAndInvoiceForStead/index.vue'
@@ -53,6 +54,7 @@ export default defineComponent({
   props: {},
   setup(props, { emit }) {
     const route = useRoute()
+    const router = useRouter()
     const tab = ref(route.query.tab || 'steadInfo')
     const keyReading = ref(1)
     const stead = ref({})
@@ -82,8 +84,12 @@ export default defineComponent({
     const reloadReading = () => {
       keyReading.value++
     }
+    const setTab = (val) => {
+      router.replace({ path: route.fullPath, query: { tab: val } })
+    }
     return {
       tab,
+      setTab,
       keyReading,
       readingEdit,
       reloadReading,

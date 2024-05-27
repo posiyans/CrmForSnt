@@ -1,161 +1,98 @@
 <template>
   <div>
-    <q-table
-      flat bordered
-      :rows="list"
-      :columns="columns"
-      hide-bottom
-      :pagination="{ rowsPerPage: 0 }"
-      wrap-cells
-      separator="cell"
-      row-key="id"
-    >
-      <template v-slot:body-cell-date="props">
-        <q-td :props="props">
-          <ShowTime :time="props.row.date" format="DD-MM-YYYY" class="" />
-          {{ props.row.device.rate.name }}
-          <div v-if="props.row.extend">
-            <div v-for="item in props.row.extend" :key="item.id">
-              {{ item.device.rate.name }}
-            </div>
-          </div>
-        </q-td>
-      </template>
-      <template v-slot:body-cell-stead="props">
-        <q-td :props="props">
-          <ShowSteadNumber :stead="props.row.device.stead" />
-        </q-td>
-      </template>
-      <template v-slot:body-cell-rate="props">
-        <q-td :props="props" :class="{ 'o-60': !props.row.device.active }">
-          <div :class="{ 'text-grey': !props.row.device.active }">
-            {{ props.row.device.rate.group_name }} {{ props.row.device.rate.name }}
-          </div>
-          <div v-if="!props.row.device.active" class="text-red">
-            Не активный
-          </div>
-        </q-td>
-      </template>
-      <template v-slot:body-cell-device="props">
-        <q-td :props="props" :class="{ 'o-60': !props.row.device.active }">
-          <div>
-            {{ props.row.device.device_brand }}
-            <span class="text-primary">
-              Sn: {{ props.row.device.serial_number }}
-            </span>
-          </div>
-          <div v-if="props.row.extend">
-            <div v-for="item in props.row.extend" :key="item.id">
-              {{ item.device.device_brand }}
-              <span class="text-primary">
-              Sn: {{ item.device.serial_number }}
-            </span>
-            </div>
-          </div>
-        </q-td>
-      </template>
-      <template v-slot:body-cell-init_value="props">
-        <q-td :props="props" :class="{ 'o-60': !props.row.device.active }">
-          <div>
-            <div class="text-weight-bold">
-              {{ props.row.value }} {{ props.row.device.rate.unit_name }}
-            </div>
-            <div class="text-small-85 text-grey">
-              {{ props.row.previous_value }} {{ props.row.device.rate.unit_name }}
-            </div>
-          </div>
-          <div v-if="props.row.extend">
-            <div v-for="item in props.row.extend" :key="item.id">
+    <table class="table-reading">
+      <thead>
+      <tr>
+        <th>
+          Участок
+        </th>
+        <th>
+          Период
+        </th>
+        <th>
+          Прибор
+        </th>
+        <th>
+          Показания
+        </th>
+        <th>
+          К оплате
+        </th>
+        <th>
+          Примечание
+        </th>
+      </tr>
+      </thead>
+      <template v-for="(item,index) in list" :key="index">
+        <tbody>
+        <template v-for="i in Object.keys(item)" :key="item[i].id">
+          <tr>
+            <td v-if="i === Object.keys(item)[0]" :rowspan="Object.keys(item).length" class="text-center cursor-pointer" @click="toStead(item[i].device.stead.id)">
+              <q-chip outline square color="primary" text-color="white">
+                {{ item[i].device.stead.number }}
+              </q-chip>
+            </td>
+            <td v-if="i === Object.keys(item)[0]" :rowspan="Object.keys(item).length" class="text-center">
+              {{ item[i].period }}
+            </td>
+            <td class="q-px-sm">
               <div>
-                <div class="text-weight-bold">
-                  {{ item.value }} {{ item.device.rate.unit_name }}
+                {{ item[i].device.rate.name }}
+              </div>
+              <div class="row text-small-80 o-80">
+                <div class="q-mr-xs">
+                  {{ item[i].device.device_brand }}
                 </div>
-                <div class="text-small-85 text-grey">
-                  {{ item.previous_value }} {{ item.device.rate.unit_name }}
+                <div class="text-primary">
+                  Sn: {{ item[i].device.serial_number }}
                 </div>
               </div>
-            </div>
-          </div>
-        </q-td>
-      </template>
-      <template v-slot:body-cell-last_value="props">
-        <q-td :props="props" :class="{ 'o-60': !props.row.device.active }">
-          {{ props.row.previous_value }} {{ props.row.device.rate.unit_name }}
-        </q-td>
-      </template>
-      <template v-slot:body-cell-delta="props">
-        <q-td :props="props" :class="{ 'o-60': !props.row.device.active }">
-          <div>
-            <div class="ellipsis">
-              {{ props.row.delta }} {{ props.row.device.rate.unit_name }}
-            </div>
-            <div class="text-small-85 text-grey">
-              {{ props.row.rate.description }}
-            </div>
-            <div>
-              <ShowPrice :price="props.row.cost" class="text-primary" />
-            </div>
-          </div>
-          <div v-if="props.row.extend">
-            <div v-for="item in props.row.extend" :key="item.id">
-              <div class="ellipsis">
-                {{ item.delta }} {{ item.device.rate.unit_name }}
+            </td>
+            <td class="text-center relative-position">
+              <div class="text-weight-bold text-no-wrap">
+                {{ item[i].value }} {{ item[i].device.rate.unit_name }}
               </div>
               <div class="text-small-85 text-grey">
-                {{ item.rate.description }}
+                {{ item[i].previous_value }} {{ item[i].device.rate.unit_name }}
+              </div>
+              <div class="absolute-top-right">
+                <DeleteInstrumentReading v-if="!item[i].invoice" :reading-id="item[i].id" @success="reload" />
+              </div>
+            </td>
+            <td class="text-center" :class="{ 'o-60': !item[i].device.active }">
+              <div class="row items-center justify-center">
+                <div class="q-mr-xs">
+                  {{ item[i].delta }} {{ item[i].device.rate.unit_name }}
+                </div>
+                <div class="text-small-85 text-grey">
+                  {{ item[i].rate.description }}
+                </div>
               </div>
               <div>
-                <ShowPrice :price="item.cost" class="text-primary" />
+                <ShowPrice :price="item[i].cost" class="text-primary" />
               </div>
-            </div>
-          </div>
-        </q-td>
-      </template>
-      <template v-slot:body-cell-desc="props">
-        <q-td :props="props" :class="{ 'o-60': !props.row.device.active }">
-          <div>
-            <div v-if="props.row.invoice" class="cursor-pointer text-red-10">
-              <InvoiceInfo :invoice="props.row.invoice">
-                Счет № {{ props.row.invoice.id }}
-              </InvoiceInfo>
-            </div>
-            <div v-if="props.row.payment" class="cursor-pointer text-teal">
-              <PaymentInfoShowAndEdit :payment="props.row.payment">
-                Платеж № {{ props.row.payment.id }}
-              </PaymentInfoShowAndEdit>
-            </div>
-          </div>
-          <div v-if="props.row.extend">
-            <div v-for="item in props.row.extend" :key="item.id">
-              <div v-if="item.invoice" class="cursor-pointer text-red-10">
-                <InvoiceInfo :invoice="item.invoice">
-                  Счет № {{ item.invoice.id }}
-                </InvoiceInfo>
+            </td>
+            <td v-if="i === Object.keys(item)[0]" :rowspan="Object.keys(item).length">
+              <div class="row items-center q-pl-sm">
+                <div>
+                  <div v-if="item[Object.keys(item)[0]].invoice" class="cursor-pointer text-red-10">
+                    <InvoiceInfo :invoice="item[Object.keys(item)[0]].invoice" :edit="edit">
+                      Счет № {{ item[Object.keys(item)[0]].invoice.id }}
+                    </InvoiceInfo>
+                  </div>
+                  <div v-if="item[Object.keys(item)[0]].payment" class="cursor-pointer text-teal">
+                    <PaymentInfoShowAndEdit :payment-id="item[Object.keys(item)[0]].payment.id" :edit="edit">
+                      Платеж № {{ item[Object.keys(item)[0]].payment.id }}
+                    </PaymentInfoShowAndEdit>
+                  </div>
+                </div>
               </div>
-              <div v-if="item.payment" class="cursor-pointer text-teal">
-                <PaymentInfoShowAndEdit :payment-id="item.payment.id">
-                  Платеж № {{ item.payment.id }}
-                </PaymentInfoShowAndEdit>
-              </div>
-            </div>
-          </div>
-        </q-td>
+            </td>
+          </tr>
+        </template>
+        </tbody>
       </template>
-      <template v-slot:body-cell-actions="props">
-        <q-td :props="props" auto-width :class="{ 'o-60': !props.row.device.active }">
-          <div class="row items-center q-col-gutter-xs">
-            <div v-if="edit" class="q-gutter-sm">
-              <DeleteInstrumentReading v-if="!props.row.invoice" :reading-id="props.row.id" @success="reload" />
-            </div>
-          </div>
-          <div v-if="edit && props.row.extend">
-            <div v-for="item in props.row.extend" :key="item.id">
-              <DeleteInstrumentReading v-if="!item.invoice" :reading-id="item.id" @success="reload" />
-            </div>
-          </div>
-        </q-td>
-      </template>
-    </q-table>
+    </table>
   </div>
 </template>
 
@@ -168,7 +105,7 @@ import PaymentInfoShowAndEdit from 'src/Modules/Bookkeeping/components/Payment/P
 import InvoiceInfo from 'src/Modules/Bookkeeping/components/Invoice/InvoiceInfo/Dialog.vue'
 import ShowPrice from 'components/ShowPrice/index.vue'
 import DeleteInstrumentReading from 'src/Modules/MeteringDevice/components/DeleteInstrumentReading/index.vue'
-import ShowSteadNumber from 'src/Modules/Stead/components/ShowSteadNumber/index.vue'
+import { useRouter } from 'vue-router'
 
 export default defineComponent({
   components: {
@@ -177,8 +114,7 @@ export default defineComponent({
     PaymentInfoShowAndEdit,
     DeleteInstrumentReading,
     InvoiceInfo,
-    ShowPrice,
-    ShowSteadNumber
+    ShowPrice
   },
   props: {
     list: {
@@ -192,56 +128,54 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const data = ref(false)
-    const columns = [
-      {
-        name: 'date',
-        align: 'center',
-        label: 'Дата'
-      },
-      {
-        name: 'stead',
-        align: 'center',
-        label: 'Участок'
-      },
-      {
-        name: 'device',
-        align: 'center',
-        label: 'Прибор'
-      },
-      {
-        name: 'init_value',
-        align: 'center',
-        label: 'Показания'
-      },
-      {
-        name: 'delta',
-        align: 'center',
-        label: 'К оплате'
-      },
-      {
-        name: 'desc',
-        align: 'center',
-        label: 'Примечание',
-      },
-      {
-        name: 'actions',
-        align: 'center',
-        label: ''
-      }
-    ]
+    const router = useRouter()
     const reload = () => {
       emit('reload')
     }
+    const toStead = (id) => {
+      router.push('/admin/stead/info/' + id + '?tab=readings',)
+    }
     return {
       data,
-      reload,
-      columns
+      toStead,
+      reload
     }
   }
 })
 </script>
 
 <style scoped lang='scss'>
+.table-tr-reading {
 
+}
+
+.table-reading {
+  td, th {
+    border: 1px solid rgba(0, 0, 0, 0.12);
+  }
+
+  th {
+    padding: 7px 16px;
+    font-weight: 500;
+    font-size: 12px;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  td {
+    font-size: 13px;
+  }
+
+  width: 100%;
+  border-collapse: collapse;
+}
+
+tbody:hover,
+tr.hover,
+th.hover,
+td.hover,
+tr.hoverable:hover {
+  background-color: #eff9ff;
+}
 </style>
 

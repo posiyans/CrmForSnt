@@ -1,29 +1,28 @@
 <template>
-  <div class="row items-center justify-center">
-    <div class="q-mr-sm" style="min-width: 250px;">
+  <div class="row items-center">
+    <div class="q-mr-md" style="min-width: 250px;">
       <component
-        v-if="option?.id"
+        v-if="options?.id"
         :is="componentName"
-        :key="option?.options?.id"
+        :key="options?.id"
         v-model="newOptionsValue"
-        :label="option?.name"
-        dense
-        :options="option.options?.options"
-        :multiple="option?.options?.type_value.key === 'multi_select'"
+        :label="options?.name"
+        :options="options?.options"
+        :multiple="options?.type_value === 'multi_select'"
       >
+        -
       </component>
     </div>
     <div>
-      <q-btn-group outline>
-        <q-btn flat padding="sm" icon="save" color="green" :disable="loading" @click="saveOptions" />
-      </q-btn-group>
+      <q-btn flat padding="sm" icon="save" color="green" :disable="loading" @click="addOptions" />
     </div>
   </div>
+
 </template>
 
 <script>
-import { computed, defineComponent, onMounted, ref } from 'vue'
-import { editAdvancedOptionsValue } from 'src/Modules/AdvancedOptions/api/advancedOptionsApi'
+import { computed, defineComponent, ref } from 'vue'
+import { addAdvancedOptionsValue } from 'src/Modules/AdvancedOptions/api/advancedOptionsApi'
 import StringType from './components/StringType.vue'
 import BooleanType from './components/BooleanType.vue'
 import SelectType from './components/SelectType.vue'
@@ -37,35 +36,53 @@ export default defineComponent({
     SelectType
   },
   props: {
-    option: {
+    dialogTitle: {
+      type: String,
+      default: 'Добавить поле'
+    },
+    objectName: {
+      type: String,
+      required: true
+    },
+    type: {
+      type: String,
+      default: ''
+    },
+    options: {
       type: Object,
       required: true
+    },
+    parentId: {
+      type: [String, Number],
+      required: true
     }
+
   },
   setup(props, { emit }) {
     const $q = useQuasar()
     const componentName = computed(() => {
-      if (props.option.options?.type_value.key === 'string') {
+      const typeValue = props.options?.type_value.key || null
+      if (typeValue === 'string') {
         return StringType
-      } else if (props.option.options?.type_value.key === 'boolean') {
+      } else if (typeValue === 'boolean') {
         return BooleanType
-      } else if (props.option.options?.type_value.key === 'select') {
+      } else if (typeValue === 'select') {
         return SelectType
-      } else if (props.option.options?.type_value.key === 'multi_select') {
+      } else if (typeValue === 'multi_select') {
         return SelectType
       }
       return 'div'
     })
     const loading = ref(false)
     const newOptionsValue = ref('')
-    const reload = () => {
+    const hideDialog = () => {
       emit('success')
     }
 
-    const saveOptions = () => {
+    const addOptions = () => {
       $q.dialog({
         title: 'Подтвердите',
-        message: 'Изменить значение для поля ' + props.option.options.name + '?',
+        message: 'Сохранить значение для поля ' + props.options.name + '?',
         cancel: {
           noCaps: true,
           flat: true,
@@ -80,26 +97,28 @@ export default defineComponent({
         },
         persistent: true
       }).onOk(() => {
+        loading.value = true
         const data = {
+          parent_id: props.parentId,
           value: newOptionsValue.value
         }
-        editAdvancedOptionsValue(props.option.id, data)
+        addAdvancedOptionsValue(props.options.id, data)
           .then(() => {
             emit('success')
           })
           .catch(er => {
             errorMessage(er.response.data.errors)
           })
+          .finally(() => {
+            loading.value = false
+          })
       })
     }
-    onMounted(() => {
-      newOptionsValue.value = props.option.value
-    })
     return {
-      loading,
       newOptionsValue,
-      reload,
-      saveOptions,
+      loading,
+      hideDialog,
+      addOptions,
       componentName
     }
   }
