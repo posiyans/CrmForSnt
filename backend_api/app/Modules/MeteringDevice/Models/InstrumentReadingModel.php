@@ -74,6 +74,11 @@ class InstrumentReadingModel extends MyModel
         return $this->metering_device->rate_group();
     }
 
+    public function stead()
+    {
+        return $this->metering_device->stead();
+    }
+
 
     /**
      * счет который выставлен на оплату данных показаний

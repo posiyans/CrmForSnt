@@ -47,16 +47,18 @@ class GetInstrumentReadingListController extends Controller
                 (new InstrumentReadingListXlsxFileResource())->render($readings, $tmpfname);
                 return response()->download($tmpfname, 'Показания_приборов_' . date("Y-m-d_H-i-s") . '.xlsx');
             } else {
-                $total = $readings
-                    ->total();
-                $readings = $readings
-                    ->paginate($request->limit, $request->page);
-                $rezult = [];
-                foreach ($readings as $date => $group) {
-                    $rezult[$date] = InstrumentReadingResource::collection($group);
+                $result = $readings
+                    ->getGroup();
+                $total = count($result);
+                $limit = $request->limit;
+                $page = $request->page;
+                $offset = ($page - 1) * $limit;
+                $data = [];
+                foreach ($result->slice($offset, $limit) as $items) {
+                    $data[] = InstrumentReadingResource::collection($items);
                 }
-                return ['meta' => ['total' => $total], 'data' => $rezult];
-                return InstrumentReadingResource::collection($readings);
+
+                return ['meta' => ['total' => $total], 'data' => $data];
             }
         } catch (\Exception $e) {
             return response(['errors' => $e->getMessage()], 450);

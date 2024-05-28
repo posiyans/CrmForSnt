@@ -181,16 +181,16 @@ class InstrumentReadingRepository
         return $this->query->get();
     }
 
-    public function paginate($limit, $page = 1)
+
+    public function getGroup()
     {
-        $result = $this->query->get()->groupBy('date');
-        $offset = ($page - 1) * $limit;
-        return $result->slice($offset, $limit);
+        $readings = $this->get();
+        $result = [];
+        foreach ($readings as $item) {
+            $result[$item->date . '_' . $item->stead->id][] = $item;
+        }
+        return collect($result);
     }
 
-    public function total()
-    {
-        return $this->query->get()->groupBy('date')->count();
-    }
 
 }
