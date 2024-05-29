@@ -167,7 +167,10 @@ class BillingDemoSeeder extends Seeder
                 ->run();
             $invoiceGroup->created_at = date('Y') - $this->count_years + $i . '-06-01 10.10.10';
             $invoiceGroup->save();
-            $invoices = CreateInvoiceAction::byInvoiceGroup($invoiceGroup, null);
+            $steads = SteadModel::all();
+            foreach ($steads as $stead) {
+                $invoices = CreateInvoiceAction::byInvoiceGroup($invoiceGroup, $stead);
+            }
             foreach ($invoices as $invoice) {
                 $invoice->created_at = (date('Y') - $this->count_years + $i . '-06-01 10:10:10');
                 $invoice->save();
