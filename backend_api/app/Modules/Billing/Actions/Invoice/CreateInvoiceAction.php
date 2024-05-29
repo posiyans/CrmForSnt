@@ -9,7 +9,6 @@ use App\Modules\MeteringDevice\Repositories\InstrumentReadingRepository;
 use App\Modules\MeteringDevice\Repositories\PreviousReadingsModelRepository;
 use App\Modules\Rate\Repositories\RateRepository;
 use App\Modules\Stead\Models\SteadModel;
-use App\Modules\Stead\Repositories\SteadRepository;
 use Carbon\Carbon;
 
 /**
@@ -129,55 +128,46 @@ class CreateInvoiceAction
      * @param array|null $steads_id Участки (null значит всем)
      * @return array
      */
-    public static function byInvoiceGroup(BillingInvoiceGroupModel $invoice_group, array|false|null $steads_id = false)
+    public static function byInvoiceGroup(BillingInvoiceGroupModel $invoice_group, SteadModel $stead)
     {
-        $steads = new SteadRepository();
-        if ($steads_id) {
-            $steads->findById($steads_id);
+        $invoice = (new self($stead))
+            ->invoiceGroup($invoice_group);
+        $rate_group = $invoice_group->rateGroup;
+        if ($rate_group->depends == 1) {
+            $invoice->title($invoice_group->title)
+                ->setPriceForRates($invoice_group->options['rate'])
+                ->setDescriptionForRates($invoice_group->options['rate'])
+                ->setTotal();
+            $invoice->run();
         }
-        $steads = $steads->get();
-        $invoices = [];
-        foreach ($steads as $stead) {
-            $invoice = (new self($stead))
-                ->invoiceGroup($invoice_group);
-            $rate_group = $invoice_group->rateGroup;
-            if ($rate_group->depends == 1) {
-                $invoice->title($invoice_group->title)
-                    ->setPriceForRates($invoice_group->options['rate'])
-                    ->setDescriptionForRates($invoice_group->options['rate'])
-                    ->setTotal();
-                $invoices[] = $invoice->run();
-            }
-            if ($rate_group->depends == 2) {
-                $rate_type = collect($invoice_group->options['rate'])->map(function ($value) {
-                    return $value['id'];
-                });
-                $invoice_date = $invoice_group->options['invoice_date'];
-                $date_start = (new Carbon($invoice_date))->startofMonth()->toDateString();
-                $date_end = (new Carbon($invoice_date))->addMonth()->startofMonth()->toDateString();
-                $readings = (new InstrumentReadingRepository())
-                    ->forRateType($rate_type->toArray())
-                    ->between_date($date_start, $date_end)
-                    ->for_stead($stead->id)
-                    ->noInvoice()
-                    ->get();
-                if ($readings->count() > 0) {
-                    $text_date = (new Carbon($invoice_date))->rawFormat('m-Y');
-                    $invoice->title($readings[0]->metering_device->rate_type->rate_group->name . ' ' . $text_date);
-                    foreach ($readings as $reading) {
-                        $invoice->byInstrumentReading($reading);
-                    }
-                    $invoice->setTotal();
-                    $invoice = $invoice->run();
-                    foreach ($readings as $reading) {
-                        $reading->invoice_id = $invoice->id;
-                        $reading->save();
-                    }
-                    $invoices[] = $invoice;
+        if ($rate_group->depends == 2) {
+            $rate_type = collect($invoice_group->options['rate'])->map(function ($value) {
+                return $value['id'];
+            });
+            $invoice_date = $invoice_group->options['invoice_date'];
+            $date_start = (new Carbon($invoice_date))->startofMonth()->toDateString();
+            $date_end = (new Carbon($invoice_date))->addMonth()->startofMonth()->toDateString();
+            $readings = (new InstrumentReadingRepository())
+                ->forRateType($rate_type->toArray())
+                ->between_date($date_start, $date_end)
+                ->for_stead($stead->id)
+                ->noInvoice()
+                ->get();
+            if ($readings->count() > 0) {
+                $text_date = (new Carbon($invoice_date))->rawFormat('m-Y');
+                $invoice->title($readings[0]->metering_device->rate_type->rate_group->name . ' ' . $text_date);
+                foreach ($readings as $reading) {
+                    $invoice->byInstrumentReading($reading);
+                }
+                $invoice->setTotal();
+                $invoice = $invoice->run();
+                foreach ($readings as $reading) {
+                    $reading->invoice_id = $invoice->id;
+                    $reading->save();
                 }
             }
         }
-        return $invoices;
+        return $invoice;
     }
 
 

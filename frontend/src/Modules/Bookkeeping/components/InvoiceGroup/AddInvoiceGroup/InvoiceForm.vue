@@ -20,11 +20,34 @@
       />
     </div>
     <div v-if="invoiceGroup.stead_type === 'selected'">
-      <div>
+      <div class="q-pa-sm text-primary">
         Выбор участков
       </div>
-      {{ invoiceGroup.steads }}
-      <AdvancedSelectedStead v-model="invoiceGroup.steads" />
+      <div class="row q-col-gutter-sm overflow-hidden">
+        <transition-group
+          enter-active-class="animated backInUp"
+          leave-active-class="animated backOutDown"
+        >
+          <div v-for="item in steadsObject" :key="item.id">
+            <q-chip
+              outline
+              square
+              color="primary"
+              text-color="white"
+              removable
+              @remove="removeStead(item.id)"
+            >
+              {{ item.number }}
+            </q-chip>
+          </div>
+        </transition-group>
+      </div>
+      <AdvancedSelectedStead
+        v-model="steads"
+        label="Найти участки"
+        outlined
+        dense
+      />
     </div>
     <div class="row items-center">
       <div class="col-grow q-pr-sm">
@@ -92,6 +115,8 @@ import { date, useQuasar } from 'quasar'
 import { addInvoiceGroup } from 'src/Modules/Bookkeeping/api/invoiceGroupApi'
 import ShowTime from 'components/ShowTime/index.vue'
 import AdvancedSelectedStead from 'src/Modules/Stead/components/AdvancedSelectedStead/index.vue'
+import { useSteadsList } from 'src/Modules/Stead/hooks/useSteadList'
+import { errorMessage } from 'src/utils/message'
 
 export default defineComponent({
   components: {
@@ -102,6 +127,10 @@ export default defineComponent({
   },
   props: {},
   setup(props, { emit }) {
+    const { steadsObject, steads } = useSteadsList()
+    const removeStead = (steadId) => {
+      steads.value.splice(steads.value.findIndex(item => steadId === item), 1)
+    }
     const data = ref(false)
     const $q = useQuasar()
     const loading = ref(false)
@@ -112,7 +141,6 @@ export default defineComponent({
     })
     const invoiceGroup = ref({
       stead_type: 'all',
-      steads: [],
       rate_group_id: '',
       title: '',
     })
@@ -191,7 +219,8 @@ export default defineComponent({
         invoice_date: invoiceDate.value,
         stead_type: invoiceGroup.value.stead_type,
         title: invoiceGroup.value.title,
-        rate: rateType.value.filter(item => item.selected)
+        rate: rateType.value.filter(item => item.selected),
+        steads: steads.value
       }
       loading.value = true
       addInvoiceGroup(data)
@@ -229,29 +258,41 @@ export default defineComponent({
         })
     }
     const saveInvoice = () => {
-      $q.dialog({
-        title: 'Подтвердите',
-        message: 'Выставить счета на ' + invoiceGroup.value.title + ' ?',
-        cancel: {
-          noCaps: true,
-          outline: true,
-          flat: true,
-          label: 'Отмена',
-          color: 'negative'
-        },
-        ok: {
-          noCaps: true,
-          outline: true,
-          label: 'Да',
-          color: 'primary'
-        },
-        persistent: true
-      })
-        .onOk(() => {
-          sendData()
+      if (checkData()) {
+        $q.dialog({
+          title: 'Подтвердите',
+          message: 'Выставить счета на ' + invoiceGroup.value.title + ' ?',
+          cancel: {
+            noCaps: true,
+            outline: true,
+            flat: true,
+            label: 'Отмена',
+            color: 'negative'
+          },
+          ok: {
+            noCaps: true,
+            outline: true,
+            label: 'Да',
+            color: 'primary'
+          },
+          persistent: true
         })
+          .onOk(() => {
+            sendData()
+          })
+      }
+    }
 
-
+    const checkData = () => {
+      let error = false
+      if (invoiceGroup.value.stead_type === 'selected' && steads.value.length === 0) {
+        error = 'Необходимо выбрать  хотя бы 1 участок'
+      }
+      if (error) {
+        errorMessage(error)
+        return false
+      }
+      return true
     }
 
     watch(() => [invoiceGroup.value.rate_group_id, invoiceDate.value],
@@ -275,7 +316,10 @@ export default defineComponent({
       saveInvoice,
       invoiceDate,
       currentRateGroup,
-      rateType
+      rateType,
+      steads,
+      steadsObject,
+      removeStead
     }
   }
 })

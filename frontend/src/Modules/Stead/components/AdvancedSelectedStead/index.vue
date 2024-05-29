@@ -7,27 +7,15 @@
       />
     </div>
     <div v-else>
-      <div class="row q-col-gutter-sm overflow-hidden">
-        <transition-group
-          enter-active-class="animated backInUp"
-          leave-active-class="animated backOutDown"
-        >
-          <div v-for="item in selectedSteads" :key="item.id">
-            <q-chip
-              outline
-              square
-              color="primary"
-              text-color="white"
-              removable
-              @remove="removeStead(item.id)"
-            >
-              {{ item.number }}
-            </q-chip>
-          </div>
-        </transition-group>
-      </div>
-      <div>
-        <q-input v-model="find" outlined label="Найти" />
+      <div class="row items-center">
+        <q-input
+          v-model="find"
+          :outlined="outlined"
+          :dense="dense"
+          :label="label"
+          class="col-grow"
+        />
+        <q-checkbox v-model="invertFind" label="Инвертировать результат" />
       </div>
       <div class="row overflow-hidden">
         <transition-group
@@ -39,10 +27,6 @@
           </div>
         </transition-group>
       </div>
-      {{ filteredList }}
-      <q-separator />
-      {{ list }}
-
     </div>
   </div>
 </template>
@@ -61,11 +45,24 @@ export default defineComponent({
     modelValue: {
       type: Array,
       default: () => []
-    }
+    },
+    label: {
+      type: String,
+      default: 'Найти'
+    },
+    dense: {
+      type: Boolean,
+      default: false
+    },
+    outlined: {
+      type: Boolean,
+      default: false
+    },
   },
   setup(props, { emit }) {
     const loading = ref(false)
     const find = ref('')
+    const invertFind = ref(false)
     const selectedSteads = computed(() => {
       return list.value.filter(item => {
         return props.modelValue.includes(item.id)
@@ -79,35 +76,46 @@ export default defineComponent({
         return !props.modelValue.includes(item.id)
       })
         .filter(item => {
-          let status = false
+          let status = invertFind.value
+          item.find = 'Не найдено ' + find.value
           if (find.value) {
-            if (item?.number.toString().toLowerCase().indexOf(find.value) !== -1) {
+            if (item?.number == find.value) {
               item.find = 'Номер: ' + item.number
-              status = true
+              status = !invertFind.value
             } else {
               item?.owners?.forEach(owner => {
                 if (owner.fullName.toLowerCase().indexOf(find.value) !== -1) {
                   item.find = owner.fullName
-                  status = true
+                  status = !invertFind.value
                 }
               })
             }
-            if (!status) {
+            if (status === invertFind.value) {
               item?.options.forEach(opt => {
-                let value = opt.value
-                if (Array.isArray(value)) {
-                  value = JSON.stringify(value)
+                let tmp = [opt.value]
+                if (opt?.options?.type_value.key === 'multi_select') {
+                  tmp = opt.value
                 }
-                console.log(value)
-                if (value && value.toString().toLowerCase().indexOf(find.value) !== -1) {
-                  item.find = opt.value
-                  status = true
-                }
+                tmp.forEach(value => {
+                  if (value && value === find.value) {
+                    item.find = opt.value + ' ' + opt?.options?.options?.unitName
+                    status = !invertFind.value
+                  } else if (opt?.options?.options?.unitName
+                    && value
+                    && (value + opt?.options?.options?.unitName).toLowerCase().indexOf(find.value.replaceAll(' ', '').toLowerCase()) !== -1
+                  ) {
+                    item.find = opt.value + ' ' + opt?.options?.options?.unitName
+                    status = !invertFind.value
+                  } else if (opt?.options?.type_value.key === 'boolean' && +opt.value === 1 && opt?.options.name.toLowerCase().indexOf(find.value.toLowerCase()) !== -1) {
+                    const tmp = +opt.value === 1 ? 'ДА' : 'НЕТ'
+                    item.find = opt?.options.name + ' ' + tmp
+                    status = !invertFind.value
+                  }
+                })
               })
             }
           }
           return status
-          // return JSON.stringify(item).toLowerCase().indexOf(find.value) !== -1
         })
     })
     const getData = () => {
@@ -144,7 +152,8 @@ export default defineComponent({
       selectedSteads,
       loading,
       list,
-      find
+      find,
+      invertFind
     }
   }
 })

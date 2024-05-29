@@ -25,7 +25,7 @@ class AddInvoiceGroupValidator extends FormRequest
             'stead_type' => [
                 'string',
                 'required',
-                Rule::in(['all'])
+                Rule::in(['all', 'selected'])
             ],
             'rate_group_id' => [
                 'required',

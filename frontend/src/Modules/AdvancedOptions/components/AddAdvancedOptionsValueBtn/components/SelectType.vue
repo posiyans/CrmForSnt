@@ -18,10 +18,17 @@
       </template>
       <template v-slot:selected>
         <div class="row items-center">
-          <div class="q-mr-xs">
-            {{ modelValue }}
+          <div v-if="multiple">
+            <div v-for="val in modelValue" :key="val">
+              {{ val }} <span v-if="options.unitName">{{ options.unitName }}</span>
+            </div>
           </div>
-          <div v-if="modelValue"> {{ options.unitName }}</div>
+          <div v-else>
+            <div class="q-mr-xs">
+              {{ modelValue }}
+            </div>
+            <div v-if="modelValue"> {{ options.unitName }}</div>
+          </div>
         </div>
       </template>
     </q-select>
@@ -30,7 +37,7 @@
 
 <script>
 /* eslint-disable */
-import { defineComponent, onMounted, ref } from 'vue'
+import { defineComponent, onMounted } from 'vue'
 
 export default defineComponent({
   components: {},
@@ -58,8 +65,10 @@ export default defineComponent({
     }
   },
   setup(props, { emit }) {
-    const newItem = ref('')
     const setValue = (val) => {
+      if (val && props.multiple) {
+        val.sort()
+      }
       emit('update:model-value', val)
     }
     onMounted(() => {

@@ -2,7 +2,7 @@
   <div>
     <div v-if="multiSelect" class="row items-center value-list">
       <div v-for="val in modelValue.value" :key="val">
-        {{ val }}<span v-if="modelValue.options.options.unitName">{{ modelValue.options.options.unitName }}</span>
+        {{ val }} <span v-if="modelValue.options.options.unitName">{{ modelValue.options.options.unitName }}</span>
       </div>
     </div>
     <div v-else>

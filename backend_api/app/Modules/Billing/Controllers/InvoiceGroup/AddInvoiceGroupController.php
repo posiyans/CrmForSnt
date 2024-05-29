@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Modules\Billing\Actions\Invoice\CreateInvoiceAction;
 use App\Modules\Billing\Actions\InvoiceGroup\CreateInvoiceGroupAction;
 use App\Modules\Billing\Validators\Invoice\AddInvoiceGroupValidator;
+use App\Modules\Stead\Repositories\SteadRepository;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -25,13 +26,23 @@ class AddInvoiceGroupController extends Controller
                 'stead_type' => $request->stead_type,
                 'invoice_date' => $request->invoice_date
             ];
+            $steads = new SteadRepository();
+            if ($request->stead_type == 'selected') {
+                if (count($request->steads) == 0) {
+                    throw new \Exception('Укажите хотя бы 1 участок');
+                }
+                $steads->findById($request->steads);
+            }
+            $steads = $steads->get();
             $invoiceGroup = (new CreateInvoiceGroupAction())
                 ->title($request->title)
                 ->rateGroup($request->rate_group_id)
                 ->options($options)
                 ->run();
-            $steads = $request->steads;
-            CreateInvoiceAction::byInvoiceGroup($invoiceGroup, $steads);
+            foreach ($steads as $stead) {
+                CreateInvoiceAction::byInvoiceGroup($invoiceGroup, $stead);
+            }
+
             if ($invoiceGroup->invoices->count() == 0) {
                 throw new \Exception('Счет на оплату не выставлен');
             }

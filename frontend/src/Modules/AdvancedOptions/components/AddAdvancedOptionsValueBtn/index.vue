@@ -36,7 +36,7 @@
               v-model="newOptionsValue"
               :label="options?.name"
               :options="options?.options"
-              :multiple="options?.type_value === 'multi_select'"
+              :multiple="options?.type_value.key === 'multi_select'"
             >
               -
             </component>

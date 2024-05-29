@@ -2,6 +2,8 @@
 
 namespace Database\Seeders\Demo;
 
+use App\Modules\AdvancedOptions\Actions\CreateAdvancedOptionsAction;
+use App\Modules\AdvancedOptions\Actions\CreateAdvancedOptionsValueAction;
 use App\Modules\Owner\Actions\AddSteadToOwnerAction;
 use App\Modules\Owner\Actions\CompareOwnerAndUserAction;
 use App\Modules\Owner\Actions\CreateOwnerAction;
@@ -12,6 +14,10 @@ use Illuminate\Database\Seeder;
 
 class SteadModelDemoSeeder extends Seeder
 {
+
+    private $options = [];
+    private $lines = ['1', '2', '3', '4'];
+
     /**
      * Run the database seeds.
      *
@@ -20,7 +26,8 @@ class SteadModelDemoSeeder extends Seeder
     public function run()
     {
         echo get_class($this) . "\n";
-        $steads = SteadModel::factory()->count(5)->create();
+        $this->createSteadAdvancedOptions();
+        $steads = SteadModel::factory()->count(50)->create();
         $owner = null;
         foreach ($steads as $stead) {
             if ($owner && rand(0, 10) > 8) {
@@ -46,6 +53,49 @@ class SteadModelDemoSeeder extends Seeder
         $user = UserModel::where('email', 'owner@examples.com')->first();
 
         (new CompareOwnerAndUserAction($owner, $user))->run();
+        foreach (SteadModel::all() as $stead) {
+            foreach ($this->options as $option) {
+                $value = '';
+                if ($option->type_value == 'select' && $option->options['selectOptions']) {
+                    $value = $option->options['selectOptions'][array_rand($option->options['selectOptions'])];
+                } else {
+                    if ($option->type_value == 'boolean') {
+                        $value = rand(0, 10) > 3 ? 1 : 0;
+                    }
+                }
+                (new CreateAdvancedOptionsValueAction($option, $stead->id))
+                    ->value($value)
+                    ->run();
+            }
+        }
+    }
+
+
+    private function createSteadAdvancedOptions()
+    {
+        $this->options[] = (new CreateAdvancedOptionsAction())
+            ->fill([
+                'name' => 'Линия',
+                'type_value' => 'select',
+                'options' => [
+                    'selectOptions' => $this->lines,
+                    'unitName' => 'линия'
+                ],
+                'type' => 'options'
+            ])
+            ->object('stead')
+            ->run();
+        $this->options[] = (new CreateAdvancedOptionsAction())
+            ->fill([
+                'name' => 'Электрифицирован',
+                'type_value' => 'boolean',
+                'options' => [
+                    'defaultValue' => false
+                ],
+                'type' => 'options'
+            ])
+            ->object('stead')
+            ->run();
     }
 
 
