@@ -165,6 +165,8 @@ class CreateInvoiceAction
                     $reading->invoice_id = $invoice->id;
                     $reading->save();
                 }
+            } else {
+                $invoice = null;
             }
         }
         return $invoice;

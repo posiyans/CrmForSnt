@@ -169,11 +169,11 @@ class BillingDemoSeeder extends Seeder
             $invoiceGroup->save();
             $steads = SteadModel::all();
             foreach ($steads as $stead) {
-                $invoices = CreateInvoiceAction::byInvoiceGroup($invoiceGroup, $stead);
-            }
-            foreach ($invoices as $invoice) {
-                $invoice->created_at = (date('Y') - $this->count_years + $i . '-06-01 10:10:10');
-                $invoice->save();
+                $invoice = CreateInvoiceAction::byInvoiceGroup($invoiceGroup, $stead);
+                if ($invoice) {
+                    $invoice->created_at = (date('Y') - $this->count_years + $i . '-06-01 10:10:10');
+                    $invoice->save();
+                }
             }
         }
     }
@@ -292,8 +292,10 @@ class BillingDemoSeeder extends Seeder
             $steads = SteadModel::all();
             foreach ($steads as $stead) {
                 $invoice = CreateInvoiceAction::byInvoiceGroup($invoiceGroup, $stead);
-                $invoice->created_at = date('Y-m-d', $date) . ' 10:10:10';
-                $invoice->save();
+                if ($invoice) {
+                    $invoice->created_at = date('Y-m-d', $date) . ' 10:10:10';
+                    $invoice->save();
+                }
             }
         }
         $readings = InstrumentReadingModel::whereNotNull('invoice_id')
