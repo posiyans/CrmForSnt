@@ -13,6 +13,7 @@
           :outlined="outlined"
           :dense="dense"
           :label="label"
+          clearable
           class="col-grow"
         />
         <q-checkbox v-model="invertFind" label="Инвертировать результат" />
