@@ -138,7 +138,7 @@ class CreateInvoiceAction
                 ->setPriceForRates($invoice_group->options['rate'])
                 ->setDescriptionForRates($invoice_group->options['rate'])
                 ->setTotal();
-            $invoice->run();
+            $invoice = $invoice->run();
         }
         if ($rate_group->depends == 2) {
             $rate_type = collect($invoice_group->options['rate'])->map(function ($value) {
