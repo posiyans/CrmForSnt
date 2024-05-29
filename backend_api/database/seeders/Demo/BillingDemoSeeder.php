@@ -16,6 +16,7 @@ use App\Modules\Rate\Models\RateModel;
 use App\Modules\Rate\Models\RateTypeModel;
 use App\Modules\Rate\Repositories\RateGroupRepository;
 use App\Modules\Rate\Resources\RateTypeResource;
+use App\Modules\Stead\Models\SteadModel;
 use App\Modules\Stead\Repositories\SteadRepository;
 use Illuminate\Database\Seeder;
 
@@ -285,7 +286,10 @@ class BillingDemoSeeder extends Seeder
                 ->rateGroup('2')
                 ->options($options)
                 ->run();
-            $invoices = CreateInvoiceAction::byInvoiceGroup($invoiceGroup);
+            $steads = SteadModel::all();
+            foreach ($steads as $stead) {
+                $invoices = CreateInvoiceAction::byInvoiceGroup($invoiceGroup, $stead);
+            }
             foreach ($invoices as $invoice) {
                 $invoice->created_at = date('Y-m-d', $date) . ' 10:10:10';
 //                $invoice->is_paid = (rand(0, 100) < 85) ? true : false;

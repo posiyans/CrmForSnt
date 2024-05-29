@@ -79,7 +79,7 @@ export default defineComponent({
           let status = invertFind.value
           item.find = 'Не найдено ' + find.value
           if (find.value) {
-            if (item?.number == find.value) {
+            if (item?.number.toLowerCase().indexOf(find.value) !== -1) {
               item.find = 'Номер: ' + item.number
               status = !invertFind.value
             } else {
