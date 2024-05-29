@@ -291,11 +291,8 @@ class BillingDemoSeeder extends Seeder
                 ->run();
             $steads = SteadModel::all();
             foreach ($steads as $stead) {
-                $invoices = CreateInvoiceAction::byInvoiceGroup($invoiceGroup, $stead);
-            }
-            foreach ($invoices as $invoice) {
+                $invoice = CreateInvoiceAction::byInvoiceGroup($invoiceGroup, $stead);
                 $invoice->created_at = date('Y-m-d', $date) . ' 10:10:10';
-//                $invoice->is_paid = (rand(0, 100) < 85) ? true : false;
                 $invoice->save();
             }
         }
