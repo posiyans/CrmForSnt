@@ -24,7 +24,7 @@
     </q-card-section>
     <q-separator />
     <q-card-section v-if="showBody" class="q-px-xs-none q-pa-sm-sm">
-      <div v-html="article.text" class="q-px-sm"></div>
+      <RenderTextBlock :text="article.text" />
       <div v-if="article.files?.length > 0" class="q-gutter-sm">
         <FilesListShow :model-value="article.files" default-view="small">
           <template v-slot:before>
@@ -49,9 +49,11 @@ import StatusShow from 'src/Modules/Article/Article/components/StatusShow/index.
 import ArticleChatBlock from './components/ArticleChatBlock/index.vue'
 import { useQuasar } from 'quasar'
 import { useRoute } from 'vue-router'
+import RenderTextBlock from 'src/Modules/RenderComponents/components/RenderTextBlock/index.vue'
 
 export default defineComponent({
   components: {
+    RenderTextBlock,
     ShowTime,
     FilesListShow,
     ArticleChatBlock,

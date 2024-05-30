@@ -1,5 +1,5 @@
 <template>
-  <div ref="commentsRef">
+  <div ref="commentsRef" v-if="showBlock">
     <div>
       <div class="q-mt-md">
         <q-btn
@@ -58,6 +58,9 @@ export default defineComponent({
       }
       return ''
     })
+    const showBlock = computed(() => {
+      return messageBlock.messageList.value.length > 0 || props.article.allow_comments !== 1
+    })
     const showChat = computed(() => {
       if (props.article.allow_comments === 1) {
         return false
@@ -86,6 +89,7 @@ export default defineComponent({
       messageBlock,
       commentsRef,
       showChat,
+      showBlock,
       errorMessage
     }
   }
