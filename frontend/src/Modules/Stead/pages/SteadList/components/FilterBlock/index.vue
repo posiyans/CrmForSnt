@@ -1,21 +1,24 @@
 <template>
   <div>
-    <q-input
-      :model-value="modelValue.find"
+    <AdvancedSelectedStead
+      :model-value="modelValue.steadsId"
+      label="Найти"
       outlined
       dense
-      label="Найти участок"
-      @update:model-value="setValue($event, 'find')" />
+      @update:model-value="setValue($event, 'steadsId')"
+    />
   </div>
 </template>
 
 <script>
 /* eslint-disable */
-import { defineComponent, onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { defineComponent } from 'vue'
+import AdvancedSelectedStead from 'src/Modules/Stead/components/AdvancedSelectedStead/index.vue'
 
 export default defineComponent({
-  components: {},
+  components: {
+    AdvancedSelectedStead
+  },
   props: {
     modelValue: {
       type: Object,
@@ -23,20 +26,13 @@ export default defineComponent({
     }
   },
   setup(props, { emit }) {
-    const data = ref(null)
-    const router = useRouter()
-    const route = useRoute()
     const setValue = (val, field) => {
       const tmp = Object.assign({}, props.modelValue)
       tmp[field] = val
       tmp.page = 1
       emit('update:model-value', tmp)
     }
-    onMounted(() => {
-
-    })
     return {
-      data,
       setValue
     }
   }

@@ -20,6 +20,10 @@ class GetSteadListValidator extends FormRequest
                 'string',
                 'nullable'
             ],
+            'steadsId' => [
+                'array',
+                'nullable'
+            ],
             'page' => [
                 'numeric',
                 'nullable'
@@ -28,11 +32,11 @@ class GetSteadListValidator extends FormRequest
                 'numeric',
                 'nullable'
             ],
-            'id' => [
-//                'exists:App\Modules\Stead\Models\SteadModel,id',
-                'numeric'
-            ],
             'admin' => [
+                'boolean'
+            ],
+            'xlsx' => [
+                'nullable',
                 'boolean'
             ]
         ];

@@ -45,6 +45,7 @@
       <AdvancedSelectedStead
         v-model="steads"
         label="Найти участки"
+        selected
         outlined
         dense
       />
