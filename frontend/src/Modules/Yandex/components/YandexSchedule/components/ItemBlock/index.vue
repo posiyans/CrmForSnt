@@ -35,7 +35,6 @@
       <div class="full-width q-pa-sm">
         <table class="TimeAndStations">
           <tbody>
-
           <tr>
             <td>
               <div class="row items-center">

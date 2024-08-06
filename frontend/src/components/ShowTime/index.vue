@@ -49,6 +49,9 @@ export default defineComponent({
       return props.time[4] === '-' && props.time[7] === '-' && props.time.length === 10
     })
     const dateUtc = computed(() => {
+      if (date.isValid(props.time)) {
+        return new Date(props.time)
+      }
       if (props.time) {
         if (sql_time.value) {
           return date.extractDate(props.time.replace(/T/g, ' ').substring(0, 19), 'YYYY-MM-DD HH:mm:ss')
@@ -67,9 +70,7 @@ export default defineComponent({
     })
     const stringTime = computed(() => {
       if (dateUtc.value) {
-        const offset = dateUtc.value.getTimezoneOffset()
-        const newDate = date.subtractFromDate(dateUtc.value, { minutes: offset })
-        return date.formatDate(newDate, props.format)
+        return date.formatDate(dateUtc.value, props.format)
       }
       return ''
     })
