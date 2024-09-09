@@ -3,7 +3,7 @@
 namespace App\Modules\Auth\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
+use App\Modules\Auth\Traits\SendsPasswordResetEmails;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 
@@ -36,7 +36,7 @@ class ForgotPasswordController extends Controller
     /**
      * Send a reset link to the given user.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return false|\Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse|string
      */
     public function sendResetLinkEmail(Request $request)
