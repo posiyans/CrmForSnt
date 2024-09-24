@@ -177,12 +177,12 @@ class CreateInvoiceAction
     {
         if (isset($rate['selected']['enable']) && $rate['selected']['enable']) {
             if (is_array($rate['selected']['steads']) && in_array($this->invoice->commentable_id, $rate['selected']['steads'])) {
-                return $this->stead_size * $rate['rate']['ratio_a'] + $rate['rate']['ratio_b'];
+                return round($this->stead_size * $rate['rate']['ratio_a'] + $rate['rate']['ratio_b'], 2);
             } else {
                 return 0;
             }
         } else {
-            return $this->stead_size * $rate['rate']['ratio_a'] + $rate['rate']['ratio_b'];
+            return round($this->stead_size * $rate['rate']['ratio_a'] + $rate['rate']['ratio_b'], 2);
         }
     }
 
@@ -192,7 +192,7 @@ class CreateInvoiceAction
         foreach ($rates as $rate) {
             $sum += $this->getPriceForRate($rate);
         }
-        $this->invoice->price = $sum;
+        $this->invoice->price = round($sum, 2);
         return $this;
     }
 
@@ -205,7 +205,7 @@ class CreateInvoiceAction
             if ($ratio_a > 0 || $ratio_b > 0) {
                 if ($ratio_a > 0) {
                     $text .= $this->stead_size . ' * ' . $ratio_a . ' руб с сотки';
-                    $text .= ' = ' . $ratio_a * $this->stead_size . ' руб';
+                    $text .= ' = ' . round($ratio_a * $this->stead_size, 2) . ' руб';
                 }
                 if ($ratio_b > 0) {
                     $text .= $ratio_b . ' руб с участка';
