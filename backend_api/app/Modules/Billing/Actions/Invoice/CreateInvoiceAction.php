@@ -177,12 +177,12 @@ class CreateInvoiceAction
     {
         if (isset($rate['selected']['enable']) && $rate['selected']['enable']) {
             if (is_array($rate['selected']['steads']) && in_array($this->invoice->commentable_id, $rate['selected']['steads'])) {
-                return round($this->stead_size * $rate['rate']['ratio_a'] + $rate['rate']['ratio_b'], 2);
+                return $this->stead_size * $rate['rate']['ratio_a'] + $rate['rate']['ratio_b'];
             } else {
                 return 0;
             }
         } else {
-            return round($this->stead_size * $rate['rate']['ratio_a'] + $rate['rate']['ratio_b'], 2);
+            return $this->stead_size * $rate['rate']['ratio_a'] + $rate['rate']['ratio_b'];
         }
     }
 
@@ -192,7 +192,7 @@ class CreateInvoiceAction
         foreach ($rates as $rate) {
             $sum += $this->getPriceForRate($rate);
         }
-        $this->invoice->price = round($sum, 2);
+        $this->invoice->price = round($sum, 0);
         return $this;
     }
 
