@@ -175,7 +175,15 @@ class CreateInvoiceAction
 
     private function getPriceForRate($rate)
     {
-        return $this->stead_size * $rate['rate']['ratio_a'] + $rate['rate']['ratio_b'];
+        if (isset($rate['selected']['enable']) && $rate['selected']['enable']) {
+            if (is_array($rate['selected']['steads']) && in_array($this->invoice->commentable_id, $rate['selected']['steads'])) {
+                return $this->stead_size * $rate['rate']['ratio_a'] + $rate['rate']['ratio_b'];
+            } else {
+                return 0;
+            }
+        } else {
+            return $this->stead_size * $rate['rate']['ratio_a'] + $rate['rate']['ratio_b'];
+        }
     }
 
     private function setPriceForRates($rates)
@@ -191,17 +199,21 @@ class CreateInvoiceAction
     private function getDescriptionForRate($rate)
     {
         $text = $rate['name'] . ': ';
-        $ratio_a = $rate['rate']['ratio_a'] ?? 0;
-        $ratio_b = $rate['rate']['ratio_b'] ?? 0;
-        if ($ratio_a > 0 || $ratio_b > 0) {
-            if ($ratio_a > 0) {
-                $text .= $this->stead_size . ' * ' . $ratio_a . ' руб с сотки';
-                $text .= ' = ' . $ratio_a * $this->stead_size . ' руб';
+        if ($this->getPriceForRate($rate) > 0) {
+            $ratio_a = $rate['rate']['ratio_a'] ?? 0;
+            $ratio_b = $rate['rate']['ratio_b'] ?? 0;
+            if ($ratio_a > 0 || $ratio_b > 0) {
+                if ($ratio_a > 0) {
+                    $text .= $this->stead_size . ' * ' . $ratio_a . ' руб с сотки';
+                    $text .= ' = ' . $ratio_a * $this->stead_size . ' руб';
+                }
+                if ($ratio_b > 0) {
+                    $text .= $ratio_b . ' руб с участка';
+                }
+                $text .= ';@';
             }
-            if ($ratio_b > 0) {
-                $text .= $ratio_b . ' руб с участка';
-            }
-            $text .= ';@';
+        } else {
+            $text .= '0 руб;@';
         }
         return $text;
     }

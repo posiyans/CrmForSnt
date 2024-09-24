@@ -98,8 +98,7 @@
     <div>
       <q-input v-model="invoiceGroup.title" outlined dense />
     </div>
-    <RateBlock :rate-type="rateType" />
-
+    <RateBlock :rate-type="rateType" :edit-rate="currentRateGroup?.depends === 1" />
     <div>
       <q-btn label="Начислить" color="primary" :loading="loading" :disable="saveDisable" @click="saveInvoice" />
     </div>

@@ -15,7 +15,25 @@
     </div>
     <div>
       <q-btn-group outline>
-        <q-btn flat padding="sm" icon="save" color="green" :disable="loading" @click="saveOptions" />
+        <q-btn flat padding="sm" icon="save" color="green" :disable="loading" @click="showDialog" />
+        <q-dialog v-model="dialogVisible" persistent>
+          <q-card>
+            <q-card-section class="row items-center q-pb-none">
+              <div class="text-h6">Подтвердите</div>
+            </q-card-section>
+            <q-card-section class="row items-center">
+              <span class="q-ml-sm">Изменить значение для поля {{ option.options.name }} ?</span>
+            </q-card-section>
+
+            <q-card-section class="q-pa-none text-grey">
+              <q-checkbox v-model="dontAsk" label="Не спрашивать больше" size="xs" />
+            </q-card-section>
+            <q-card-actions align="right">
+              <q-btn flat label="Отмена" color="primary" v-close-popup />
+              <q-btn flat label="Сохранить" color="primary" @click="saveOptions" />
+            </q-card-actions>
+          </q-card>
+        </q-dialog>
       </q-btn-group>
     </div>
   </div>
@@ -27,8 +45,9 @@ import { editAdvancedOptionsValue } from 'src/Modules/AdvancedOptions/api/advanc
 import StringType from './components/StringType.vue'
 import BooleanType from './components/BooleanType.vue'
 import SelectType from './components/SelectType.vue'
-import { useQuasar } from 'quasar'
+// import { useQuasar } from 'quasar'
 import { errorMessage } from 'src/utils/message'
+import { useAdvancedOptions } from 'src/Modules/AdvancedOptions/use/useAdvancedOptions'
 
 export default defineComponent({
   components: {
@@ -43,7 +62,9 @@ export default defineComponent({
     }
   },
   setup(props, { emit }) {
-    const $q = useQuasar()
+    // const $q = useQuasar()
+    const { dontAsk } = useAdvancedOptions()
+    const dialogVisible = ref(false)
     const componentName = computed(() => {
       if (props.option.options?.type_value.key === 'string') {
         return StringType
@@ -61,41 +82,50 @@ export default defineComponent({
     const reload = () => {
       emit('success')
     }
-
+    const showDialog = () => {
+      if (dontAsk.value) {
+        saveOptions()
+      } else {
+        dialogVisible.value = true
+      }
+    }
     const saveOptions = () => {
-      $q.dialog({
-        title: 'Подтвердите',
-        message: 'Изменить значение для поля ' + props.option.options.name + '?',
-        cancel: {
-          noCaps: true,
-          flat: true,
-          label: 'Отмена',
-          color: 'negative'
-        },
-        ok: {
-          noCaps: true,
-          outline: true,
-          label: 'Сохранить',
-          color: 'primary'
-        },
-        persistent: true
-      }).onOk(() => {
-        const data = {
-          value: newOptionsValue.value
-        }
-        editAdvancedOptionsValue(props.option.id, data)
-          .then(() => {
-            emit('success')
-          })
-          .catch(er => {
-            errorMessage(er.response.data.errors)
-          })
-      })
+      // $q.dialog({
+      //   title: 'Подтвердите',
+      //   message: 'Изменить значение для поля ' + props.option.options.name + '?',
+      //   cancel: {
+      //     noCaps: true,
+      //     flat: true,
+      //     label: 'Отмена',
+      //     color: 'negative'
+      //   },
+      //   ok: {
+      //     noCaps: true,
+      //     outline: true,
+      //     label: 'Сохранить',
+      //     color: 'primary'
+      //   },
+      //   persistent: true
+      // }).onOk(() => {
+      const data = {
+        value: newOptionsValue.value
+      }
+      editAdvancedOptionsValue(props.option.id, data)
+        .then(() => {
+          emit('success')
+        })
+        .catch(er => {
+          errorMessage(er.response.data.errors)
+        })
+      // })
     }
     onMounted(() => {
       newOptionsValue.value = props.option.value
     })
     return {
+      dontAsk,
+      dialogVisible,
+      showDialog,
       loading,
       newOptionsValue,
       reload,

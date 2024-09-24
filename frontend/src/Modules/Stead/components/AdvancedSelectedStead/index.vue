@@ -25,6 +25,14 @@
           enter-active-class="animated backInDown"
           leave-active-class="animated backOutUp"
         >
+          <div v-if="filteredList.length > 1" @click="selectAll">
+            <q-chip outline square color="secondary" text-color="white">
+              Все
+              <q-tooltip>
+                Выбрать все
+              </q-tooltip>
+            </q-chip>
+          </div>
           <div v-for="item in filteredList" :key="item.id" class="cursor-pointer" @click="selectItem(item)">
             <ShowItem :item="item" :find="find" />
           </div>
@@ -77,6 +85,13 @@ export default defineComponent({
         return a.number - b.number
       })
     })
+    const selectAll = () => {
+      const tmp = Object.assign([], props.modelValue)
+      filteredList.value.forEach(item => {
+        tmp.push(item.id)
+      })
+      emit('update:model-value', tmp)
+    }
     const list = ref([])
     const filteredList = computed(() => {
       let tmp = list.value
@@ -178,6 +193,7 @@ export default defineComponent({
       getData()
     })
     return {
+      selectAll,
       filteredList,
       setValue,
       removeStead,
