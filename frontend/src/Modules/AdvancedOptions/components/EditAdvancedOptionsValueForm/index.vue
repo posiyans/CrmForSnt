@@ -90,23 +90,6 @@ export default defineComponent({
       }
     }
     const saveOptions = () => {
-      // $q.dialog({
-      //   title: 'Подтвердите',
-      //   message: 'Изменить значение для поля ' + props.option.options.name + '?',
-      //   cancel: {
-      //     noCaps: true,
-      //     flat: true,
-      //     label: 'Отмена',
-      //     color: 'negative'
-      //   },
-      //   ok: {
-      //     noCaps: true,
-      //     outline: true,
-      //     label: 'Сохранить',
-      //     color: 'primary'
-      //   },
-      //   persistent: true
-      // }).onOk(() => {
       const data = {
         value: newOptionsValue.value
       }
@@ -117,7 +100,6 @@ export default defineComponent({
         .catch(er => {
           errorMessage(er.response.data.errors)
         })
-      // })
     }
     onMounted(() => {
       newOptionsValue.value = props.option.value
