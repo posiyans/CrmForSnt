@@ -156,7 +156,10 @@ export default defineComponent({
           .then(res => {
             rateType.value = res.data.data
             rateType.value.forEach(item => {
-              item.selected = true
+              item.selected = {
+                enable: false,
+                steads: []
+              }
             })
           })
       } else {

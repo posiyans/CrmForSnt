@@ -35,7 +35,7 @@ export default defineComponent({
     const data = ref({
       description: 'Членский взнос 2',
       name: 'Оплата членского взноса 2',
-      depends: 3,
+      depends: 1,
       selected: {
         enable: false,
         steads: []

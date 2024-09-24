@@ -20,13 +20,13 @@
           <div>
             <InputNumber v-model="newRate.rate.ratio_a" :label="rateLabel" outlined @update:model-value="changeRate" />
           </div>
-          <div v-if="newRate.depends === 1 || newRate.depends === 3">
+          <div v-if="newRate.depends === 1">
             <InputNumber v-model="newRate.rate.ratio_b" label="Тариф на 1 участок" outlined @update:model-value="changeRate" />
           </div>
           <div>
             <q-input v-model="newRate.rate.description" readonly label="Описание оплаты" outlined hint="Если участок есть в списке" :hide-hint="!newRate.selected.enable" />
           </div>
-          <div v-if="newRate.depends === 3">
+          <div v-if="newRate.depends === 1">
             <q-checkbox
               v-model="newRate.selected.enable"
               label="Выборочно для участков"
@@ -123,14 +123,7 @@ export default defineComponent({
     const dialogVisible = ref(false)
     const showDialog = () => {
       newRate.value = Object.assign({}, props.modelValue)
-      if (!newRate.value.selected) {
-        newRate.value.selected = {
-          enable: false,
-          steads: []
-        }
-      }
       steads.value = props.modelValue.selected.steads
-      console.log(newRate.value)
       dialogVisible.value = true
     }
     const success = () => {

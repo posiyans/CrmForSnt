@@ -44,6 +44,9 @@ export default defineComponent({
     const data = ref(false)
     const dialogVisible = ref(false)
     const showDialog = () => {
+      if (!props.rate.rate) {
+        props.rate.rate = {}
+      }
       dialogVisible.value = true
     }
     const success = () => {
