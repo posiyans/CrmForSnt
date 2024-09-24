@@ -15,6 +15,24 @@
     </div>
     <div>
       <q-btn flat padding="sm" icon="save" color="green" :disable="loading" @click="addOptions" />
+      <q-dialog v-model="dialogVisible" persistent>
+        <q-card>
+          <q-card-section class="row items-center q-pb-none">
+            <div class="text-h6">Подтвердите</div>
+          </q-card-section>
+          <q-card-section class="row items-center">
+            <span class="q-ml-sm">Изменить значение для поля {{ options.name }} ?</span>
+          </q-card-section>
+
+          <q-card-section class="q-pa-none text-grey">
+            <q-checkbox v-model="dontAsk" label="Не спрашивать больше" size="xs" />
+          </q-card-section>
+          <q-card-actions align="right">
+            <q-btn flat label="Отмена" color="primary" v-close-popup />
+            <q-btn flat label="Сохранить" color="primary" @click="saveOptions" />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
     </div>
   </div>
 
@@ -26,8 +44,8 @@ import { addAdvancedOptionsValue } from 'src/Modules/AdvancedOptions/api/advance
 import StringType from './components/StringType.vue'
 import BooleanType from './components/BooleanType.vue'
 import SelectType from './components/SelectType.vue'
-import { useQuasar } from 'quasar'
 import { errorMessage } from 'src/utils/message'
+import { useAdvancedOptions } from 'src/Modules/AdvancedOptions/use/useAdvancedOptions'
 
 export default defineComponent({
   components: {
@@ -59,7 +77,8 @@ export default defineComponent({
 
   },
   setup(props, { emit }) {
-    const $q = useQuasar()
+    const { dontAsk } = useAdvancedOptions()
+    const dialogVisible = ref(false)
     const componentName = computed(() => {
       const typeValue = props.options?.type_value.key || null
       if (typeValue === 'string') {
@@ -78,43 +97,34 @@ export default defineComponent({
     const hideDialog = () => {
       emit('success')
     }
-
+    const saveOptions = () => {
+      loading.value = true
+      const data = {
+        parent_id: props.parentId,
+        value: newOptionsValue.value
+      }
+      addAdvancedOptionsValue(props.options.id, data)
+        .then(() => {
+          emit('success')
+        })
+        .catch(er => {
+          errorMessage(er.response.data.errors)
+        })
+        .finally(() => {
+          loading.value = false
+        })
+    }
     const addOptions = () => {
-      $q.dialog({
-        title: 'Подтвердите',
-        message: 'Сохранить значение для поля ' + props.options.name + '?',
-        cancel: {
-          noCaps: true,
-          flat: true,
-          label: 'Отмена',
-          color: 'negative'
-        },
-        ok: {
-          noCaps: true,
-          outline: true,
-          label: 'Сохранить',
-          color: 'primary'
-        },
-        persistent: true
-      }).onOk(() => {
-        loading.value = true
-        const data = {
-          parent_id: props.parentId,
-          value: newOptionsValue.value
-        }
-        addAdvancedOptionsValue(props.options.id, data)
-          .then(() => {
-            emit('success')
-          })
-          .catch(er => {
-            errorMessage(er.response.data.errors)
-          })
-          .finally(() => {
-            loading.value = false
-          })
-      })
+      if (dontAsk) {
+        saveOptions()
+      } else {
+        dialogVisible.value = true
+      }
     }
     return {
+      dialogVisible,
+      saveOptions,
+      dontAsk,
       newOptionsValue,
       loading,
       hideDialog,

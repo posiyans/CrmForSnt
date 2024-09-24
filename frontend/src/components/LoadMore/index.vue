@@ -102,14 +102,17 @@ export default defineComponent({
       emit('loading', true)
       const tmp = Object.assign({}, props.listQuery)
       if (addList.value) {
-        tmp.page = +tmp.page + addList.value
+        tmp.page++
       }
+      props.listQuery.page = tmp.page
       props.func(tmp)
         .then(response => {
           total.value = response.data?.meta?.total || response.data.total || 0
           offset.value = response.data?.meta?.offset || response.data.offset || 0
           if (!addList.value) {
             list.value = []
+          } else {
+            addList.value = false
           }
           for (const i in response.data.data) {
             list.value.push(response.data.data[i])
@@ -136,7 +139,7 @@ export default defineComponent({
     }
     const add = () => {
       autoScroll.value = false
-      addList.value = +addList.value + 1
+      addList.value = true
       getList()
     }
     const deepEqual = (obj1, obj2) => {
