@@ -52,7 +52,8 @@ class RateTypeModel extends MyModel
         $data = $this->getCurrentDate();
         return $this->hasOne(RateModel::class, 'rate_type_id', 'id')
             ->where('date_start', '<', $data)
-            ->orderBy('date_start', 'desc');
+            ->orderBy('date_start', 'desc')
+            ->orderBy('id', 'desc');
     }
 
 
