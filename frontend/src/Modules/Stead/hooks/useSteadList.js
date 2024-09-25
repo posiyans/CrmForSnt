@@ -23,6 +23,7 @@ export function useSteadsList() {
     })
   })
   return {
+    loading,
     allSteads,
     steadsObject,
     steads

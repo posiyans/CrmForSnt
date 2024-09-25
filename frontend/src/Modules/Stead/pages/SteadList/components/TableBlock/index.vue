@@ -21,7 +21,25 @@
             {{ col.label }}
           </q-th>
           <q-th v-for="item in showAdvancedColumns" :key="item">
-            {{ option(item)?.name }}
+            <div class="row justify-center items-center">
+              <div>
+                {{ option(item)?.name }}
+              </div>
+              <q-space />
+              <div>
+                <q-fab
+                  text-color="black"
+                  icon="more_vert"
+                  flat
+                  direction="left"
+                  square
+                  unelevated
+                  padding="0"
+                >
+                  <GroupChangeDialog :option="option(item)" @success="reload" />
+                </q-fab>
+              </div>
+            </div>
           </q-th>
           <q-th>
             <div class="row items-center">
@@ -97,6 +115,7 @@ import AddAdvancedOptionsValueBtn from 'src/Modules/AdvancedOptions/components/A
 import { useAuthStore } from 'src/Modules/Auth/store/useAuthStore'
 import AdvancedOptionsTd from 'src/Modules/Stead/pages/SteadList/components/TableBlock/AdvancedOptionsTd.vue'
 import { SessionStorage } from 'quasar'
+import GroupChangeDialog from 'src/Modules/Stead/pages/SteadList/components/TableBlock/GroupChangeDialog.vue'
 
 export default defineComponent({
   components: {
@@ -104,7 +123,8 @@ export default defineComponent({
     OwnerUserNameAndProportionBlock,
     UserNameByUid,
     SteadListTableOptions,
-    AddAdvancedOptionsValueBtn
+    AddAdvancedOptionsValueBtn,
+    GroupChangeDialog
   },
   props: {
     list: {
