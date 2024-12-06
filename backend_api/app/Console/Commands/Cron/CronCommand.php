@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands\Cron;
 
-use App\Models\Settings\CameraModel;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Artisan;
 
 class CronCommand extends Command
 {
@@ -38,8 +38,9 @@ class CronCommand extends Command
      */
     public function handle()
     {
-        echo 'Cron Action'. PHP_EOL;
-        CameraModel::updateAllCache();
-
+        echo 'Cron Action' . PHP_EOL;
+        // todo удалить
+        // CameraModel::updateAllCache();
+        Artisan::call('camera:refresh-image');
     }
 }

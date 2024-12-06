@@ -198,8 +198,9 @@ class CreateInvoiceAction
 
     private function getDescriptionForRate($rate)
     {
-        $text = $rate['name'] . ': ';
+        $text = '';
         if ($this->getPriceForRate($rate) > 0) {
+            $text .= $rate['name'] . ': ';
             $ratio_a = $rate['rate']['ratio_a'] ?? 0;
             $ratio_b = $rate['rate']['ratio_b'] ?? 0;
             if ($ratio_a > 0 || $ratio_b > 0) {
@@ -212,8 +213,6 @@ class CreateInvoiceAction
                 }
                 $text .= ';@';
             }
-        } else {
-            $text .= '0 руб;@';
         }
         return $text;
     }

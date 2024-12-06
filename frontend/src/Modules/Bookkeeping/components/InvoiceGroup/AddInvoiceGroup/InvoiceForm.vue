@@ -21,7 +21,10 @@
     </div>
     <div v-if="invoiceGroup.stead_type === 'selected'">
       <div class="q-pa-sm text-primary">
-        Выбор участков
+        Выбор участков <span class="text-grey">
+        ({{ steads.length }})
+
+      </span>
       </div>
       <div class="row q-col-gutter-sm overflow-hidden">
         <transition-group

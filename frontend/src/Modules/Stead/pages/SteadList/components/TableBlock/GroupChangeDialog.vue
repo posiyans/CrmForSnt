@@ -117,6 +117,7 @@ export default defineComponent({
     const steads = ref([])
     const rawText = ref('')
     const showDialog = () => {
+      rawText.value = ''
       steads.value = []
       newOptionsValue.value = ''
       dialogVisible.value = true
