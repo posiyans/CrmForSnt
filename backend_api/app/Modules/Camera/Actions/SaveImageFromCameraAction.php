@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Storage;
 class SaveImageFromCameraAction
 {
     private $camera;
-    private $timeout = 3000;
+    private $timeout = 3;
 
     public function __construct($camera)
     {
@@ -41,7 +41,7 @@ class SaveImageFromCameraAction
         }
         if ($ffmpeg) {
             $tmpfname = tempnam(sys_get_temp_dir(), "camera_" . $this->camera->id);
-            $cmd = $ffmpeg . " -rtsp_transport tcp -stimeout " . $this->timeout . "  -y -i " . $this->camera->url . " -f image2 -vframes 1 " . $tmpfname;
+            $cmd = $ffmpeg . " -rtsp_transport tcp -y -i " . $this->camera->url . " -f image2 -vframes 1 " . $tmpfname;
             $this->PsExecute($cmd, $tmpfname);
             $size = env('CAMERA_IMG_MIN_FILE_SIZE', 10000);
             if (!file_exists($tmpfname) || filesize($tmpfname) < $size) {
