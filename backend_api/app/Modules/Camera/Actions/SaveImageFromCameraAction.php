@@ -62,25 +62,26 @@ class SaveImageFromCameraAction
     }
 
 
-    function PsExec($commandJob)
-    {
-        $command = $commandJob;
-        exec($command, $op);
-        $pid = (int)$op[0];
-
-        if ($pid != "") {
-            return $pid;
-        }
-
-        return false;
-    }
+//    function PsExec($commandJob)
+//    {
+//        $command = $commandJob;
+//        exec($command, $op);
+//        $pid = (int)$op[0];
+//
+//        if ($pid != "") {
+//            return $pid;
+//        }
+//
+//        return false;
+//    }
 
     function PsExecute($command)
     {
-        $pid = $this->PsExec($command);
-        if ($pid === false) {
-            return false;
-        }
+        exec($command, $op);
+//        $pid = $this->PsExec($command);
+//        if ($pid === false) {
+//            return false;
+//        }
 //
 //        $cur = 0;
 //        // пока не истекло время отведенное на выполнение скрипта продолжаем ждать
@@ -88,7 +89,7 @@ class SaveImageFromCameraAction
 //            sleep(1);
 //            $cur += 1;
 //        }
-        exec("kill -9 $pid", $output);
+        // exec("kill -9 $pid", $output);
     }
 
 
