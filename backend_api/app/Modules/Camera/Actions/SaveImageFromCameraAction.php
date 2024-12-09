@@ -42,7 +42,7 @@ class SaveImageFromCameraAction
         if ($ffmpeg) {
             $tmpfname = tempnam(sys_get_temp_dir(), "camera_" . $this->camera->id);
             $cmd = $ffmpeg . " -rtsp_transport tcp -y -i " . $this->camera->url . " -f image2 -vframes 1 " . $tmpfname;
-            $this->PsExecute($cmd, $tmpfname);
+            $this->PsExecute($cmd);
             $size = env('CAMERA_IMG_MIN_FILE_SIZE', 10000);
             if (!file_exists($tmpfname) || filesize($tmpfname) < $size) {
                 if ($count > 0) {
@@ -64,7 +64,7 @@ class SaveImageFromCameraAction
 
     function PsExec($commandJob)
     {
-        $command = $commandJob . ' & echo $!';
+        $command = $commandJob;
         exec($command, $op);
         $pid = (int)$op[0];
 
@@ -81,13 +81,13 @@ class SaveImageFromCameraAction
         if ($pid === false) {
             return false;
         }
-
-        $cur = 0;
-        // пока не истекло время отведенное на выполнение скрипта продолжаем ждать
-        while ($cur < $this->timeout) {
-            sleep(1);
-            $cur += 1;
-        }
+//
+//        $cur = 0;
+//        // пока не истекло время отведенное на выполнение скрипта продолжаем ждать
+//        while ($cur < $this->timeout) {
+//            sleep(1);
+//            $cur += 1;
+//        }
         exec("kill -9 $pid", $output);
     }
 
