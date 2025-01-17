@@ -9,7 +9,6 @@ export function useDownloadFile() {
           fileName = decodeURIComponent(response.headers['content-disposition'].split("filename*=utf-8''")[1].split(';')[0])
         } catch (e) {
         }
-        exportFile(fileName, response.data)
         const status = exportFile(fileName, response.data)
         if (status !== true) {
           Notify.create({
