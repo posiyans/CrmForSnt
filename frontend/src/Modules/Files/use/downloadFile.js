@@ -12,7 +12,7 @@ export function useDownloadFile() {
         const status = exportFile(fileName, response.data)
         if (status !== true) {
           Notify.create({
-            message: 'Ошибка получения файла',
+            message: 'Ошибка сохранения файла',
             color: 'negative'
           })
         }
