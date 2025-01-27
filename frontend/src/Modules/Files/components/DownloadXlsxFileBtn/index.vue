@@ -24,7 +24,7 @@ export default defineComponent({
       fileDownload.value = true
       props.func()
         .then(response => {
-          let fileName = response.headers['content-disposition'].split('filename=')[1].split(';')[0]
+          let fileName = response.headers['content-disposition'].split('filename=')[1].split(';')[0].replace(/['"]/g, '')
           try {
             fileName = decodeURIComponent(response.headers['content-disposition'].split("filename*=utf-8''")[1].split(';')[0])
           } catch (e) {
